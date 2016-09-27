@@ -11,8 +11,6 @@ class GetCorrection():
 
       def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag):
 
-
-
           self.pTLow_1st = {'e': 40, 'mu': 40}
           self.pTHigh_1st = {'e': 50, 'mu': 50}
           self.etaLow_1st = {'e': 0, 'mu': 0}
@@ -41,7 +39,7 @@ class GetCorrection():
           self.fileName = "DYJetsToLL_M-50_m2" + self.fs + ".root"
           if isData:
              self.fileName = "DoubleLepton_m2" + self.fs + ".root"
-          self.treeFile = TFile("../inputRoot/"+self.fileName)
+          self.treeFile = TFile("../inputRootFiles/"+self.fileName)
           self.tree = self.treeFile.Get("passedEvents")
           print 'tree opened'
 
@@ -52,30 +50,23 @@ class GetCorrection():
           self.name += "_" + tag
 
           self.tag = tag
-          #new tree to construct dataset
-#          self.MakeSmallTree()
-#          newTreeFile = TFile(self.path+self.name+".root")
-#          self.newTree = newTreeFile.Get("t1")
-#          print 'new tree made'
-#          print self.newTree.GetEntries()
-#          self.newTree.Print()
 
           self.hgenzm = TH1F("hgenzm","hgenzm",200,80,100)
-          tmpName = self.name.replace("DoubleLepton","DYJetsToLL_M-50").replace(self.tag, "doLambda2_getPara_" + fs)
-          genzmFile = TFile("genZShape/" + tmpName + "_genZShape.root")
-          tmp_hgenzm = genzmFile.Get("hgenzm")
-          for i in range(tmp_hgenzm.GetSize()-1):
-              if i >= 1:
-                 self.hgenzm.SetBinContent(i, tmp_hgenzm.GetBinContent(i))
-
-#         self.tree.Project(self.hgenzm.GetName(), "genzm", "weight*(" + self.cut + ")")
-
-          print 'z shape got'
-##save genZ shape if needed
-#          genzmFile = TFile("genZShape/" + self.name + "_genZShape.root", "RECREATE")
-#          genzmFile.cd()
-#          self.hgenzm.Write()
-#          genzmFile.Close()
+#used for data
+          if isData:
+             tmpName = self.name.replace("DoubleLepton","DYJetsToLL_M-50").replace(self.tag, "doLambda2_getPara_" + fs)
+             genzmFile = TFile("genZShape/" + tmpName + "_genZShape.root")
+             tmp_hgenzm = genzmFile.Get("hgenzm")
+             for i in range(tmp_hgenzm.GetSize()-1):
+                 if i >= 1:
+                    self.hgenzm.SetBinContent(i, tmp_hgenzm.GetBinContent(i))
+#used for mc
+          else:
+             self.tree.Project(self.hgenzm.GetName(), "genzm", "weight*(" + self.cut + ")")
+             genzmFile = TFile("genZShape/" + self.name + "_genZShape.root", "RECREATE")
+             genzmFile.cd()
+             self.hgenzm.Write()
+             genzmFile.Close()
 
           #initial shape parameters
           self.shapePara = shapePara
@@ -166,8 +157,8 @@ class GetCorrection():
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
           #Crystalball
           mean = RooRealVar("mean","mean", 0, -1, 1)
-          alpha = RooRealVar("alpha","alpha", 1.2, 0, 50)
-          n = RooRealVar("n","n", 15, 0.1, 50)
+          alpha = RooRealVar("alpha","alpha", 1.1, 1, 50)
+          n = RooRealVar("n","n", 15, 0, 50)
           #alpha2 = RooRealVar("alpha2","alpha2", 1.2, 0, 50)
           #n2 = RooRealVar("n2","n2", 15, 0.1, 50)
           sigma = RooRealVar("sigma", "sigma", 0.1, 0, 10)
@@ -184,7 +175,7 @@ class GetCorrection():
           p2 = RooFormulaVar("p2", "@1*@0+@2*@0*@0",RooArgList(massZ,pa1,pa2))
           bkg = RooExponential("bkg","bkg", p2, tau)
           #fsig
-          fsig = RooRealVar("fsig","signal fraction", 0.7, 0.5, 1.0)
+          fsig = RooRealVar("fsig","signal fraction", 0.7, 0.5, 0.99)#1.0)
           model = RooAddPdf("model","model", CBxBW, bkg, fsig)
           getattr(self.w,'import')(model)
 
