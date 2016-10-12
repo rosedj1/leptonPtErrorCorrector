@@ -8,8 +8,8 @@ step to run package
 
 other directories:
 
-1, dir to save correction factors: lambdas_singleCB
-
+1, dir to save correction factors: lambdas_singleCB, edit in getLambda2.py
+ 
 2, set inputdirectory in pTErrCorrector.py ("self.fileName")
 
 3, set where to put plots in getLambda1.py and getLambda2.py ("path")
