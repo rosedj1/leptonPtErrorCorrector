@@ -2,7 +2,9 @@
 
 step to run package
 
-1, ./doLambda1.sh
+1, ./doLambda1.sh 
+
+Take lambda1 from output/plots and put in doAll.sh
 
 2, ./doAll.sh
 
