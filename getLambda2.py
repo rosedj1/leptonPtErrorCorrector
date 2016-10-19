@@ -31,7 +31,7 @@ lambdas = {'lambda1':lambda1_pre, 'lambda2':1}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 #shapePara = {"mean":0, "alpha":0, "n":0, "alpha2":0, "n2":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 
-path = "/home/mhl/public_html/2016/20160926_2015MCebeCorrection/getLambda2/"
+path = "/home/mhl/public_html/2016/20161011_2015MCebeCorrection/getLambda2/"
 
 tag = "doLambda2_getPara_" + fs
 
@@ -40,6 +40,7 @@ getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePa
 
 getCorr_getPara.DriverGetPara()
 
+sys.exit()
 if args.doDEBUG_para:
    sys.exit()
 

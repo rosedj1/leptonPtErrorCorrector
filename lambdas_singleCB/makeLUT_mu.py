@@ -59,8 +59,13 @@ for i in range(len(binx)-1):
         LUT.SetBinContent(i+1,j+1,getLambda2(txtName))
 
 LUT.SetBinContent(3,2,1)
+#LUT.SetBinContent(3,1,1)
+#LUT.SetBinContent(2,3,1.3)
+
 LUT.SetBinContent(1,1,1.3)
-print LUT.GetBinContent(3,2)
+
+#print LUT.GetBinContent(3,2)
+
 
 c1 = TCanvas("c1","",800,800)
 LUT.Draw("text")

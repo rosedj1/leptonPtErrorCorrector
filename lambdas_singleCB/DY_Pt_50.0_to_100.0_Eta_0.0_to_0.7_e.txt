@@ -1,4 +1,5 @@
-it: 0, lambda: 1.05520577577, lambda2: 1, lambda2_next: 1.05520577577
-it: 1, lambda: 1.02693526094, lambda2: 1.05520577577, lambda2_next: 1.08362801869
-it: 2, lambda: 1.01405187533, lambda2: 1.08362801869, lambda2_next: 1.09885502451
-it: 3, lambda: 1.00743127473, lambda2: 1.09885502451, lambda2_next: 1.10702091808
+it: 0, lambda: 1.09424471391, lambda2: 1, lambda2_next: 1.09424471391
+it: 1, lambda: 1.05347881682, lambda2: 1.09424471391, lambda2_next: 1.15276362652
+it: 2, lambda: 1.02450142508, lambda2: 1.15276362652, lambda2_next: 1.18100797815
+it: 3, lambda: 1.01317049962, lambda2: 1.18100797815, lambda2_next: 1.19656244327
+it: 4, lambda: 1.00773506104, lambda2: 1.19656244327, lambda2_next: 1.20581792681

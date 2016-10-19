@@ -11,10 +11,16 @@ class GetCorrection():
 
       def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag):
 
-          self.pTLow_1st = {'e': 40, 'mu': 40}
-          self.pTHigh_1st = {'e': 50, 'mu': 50}
-          self.etaLow_1st = {'e': 0, 'mu': 0}
-          self.etaHigh_1st = {'e': 0.7, 'mu': 0.9}
+          if not doLambda1:
+             self.pTLow_1st = {'e': 40, 'mu': 40}
+             self.pTHigh_1st = {'e': 50, 'mu': 50}
+             self.etaLow_1st = {'e': 0, 'mu': 0}
+             self.etaHigh_1st = {'e': 0.7, 'mu': 0.9}
+          else:
+             self.pTLow_1st = {'e': binEdge['pTLow'], 'mu': binEdge['pTLow']}
+             self.pTHigh_1st = {'e': binEdge['pTHigh'], 'mu': binEdge['pTHigh']}
+             self.etaLow_1st = {'e': binEdge['etaLow'], 'mu': binEdge['etaLow']}
+             self.etaHigh_1st = {'e': binEdge['etaHigh'], 'mu': binEdge['etaHigh']}
 
           #can also set first bin as dict
 
@@ -32,14 +38,16 @@ class GetCorrection():
           #cut to make dataset
           self.cut = " (massZ > 80 && massZ < 100) && " 
           self.cut += " (massZErr > 0.2 && massZErr < 7.2) && "
-          self.cut += " (Met < 30) && "
+          self.cut += " (Met < 30 && GENmass2l > 0) && "
           self.doLambdaCut() # doLambda1Cut or doLambda2Cut
 
           #tree to get information
-          self.fileName = "DYJetsToLL_M-50_m2" + self.fs + ".root"
+#          self.fileName = "DYJetsToLL_M-50_m2" + self.fs + ".root"
+          self.fileName = "DYJetsToLL_M-50_kalman_v4_m2" + self.fs + ".root"
           if isData:
              self.fileName = "DoubleLepton_m2" + self.fs + ".root"
-          self.treeFile = TFile("../inputRootFiles/"+self.fileName)
+#          self.treeFile = TFile("../inputRootFiles/"+self.fileName)
+          self.treeFile = TFile("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_2015MC/HZZ4L_Mass/makeSlimTree/DY_2015MC_kalman_v4/"+self.fileName)
           self.tree = self.treeFile.Get("passedEvents")
           print 'tree opened'
 
@@ -62,7 +70,7 @@ class GetCorrection():
                     self.hgenzm.SetBinContent(i, tmp_hgenzm.GetBinContent(i))
 #used for mc
           else:
-             self.tree.Project(self.hgenzm.GetName(), "genzm", "weight*(" + self.cut + ")")
+             self.tree.Project(self.hgenzm.GetName(), "GENmass2l", "weight*(" + self.cut + ")")
              genzmFile = TFile("genZShape/" + self.name + "_genZShape.root", "RECREATE")
              genzmFile.cd()
              self.hgenzm.Write()
@@ -140,8 +148,8 @@ class GetCorrection():
           self.Data_Zlls_w = RooDataSet(self.Data_Zlls.GetName(), self.Data_Zlls.GetTitle(), self.Data_Zlls, self.Data_Zlls.get(), "1", "weight")
           print "dataset has " + str(self.Data_Zlls_w.numEntries()) + " events"
 
-          massZ.setBins(30,"fft")
-          massZErr.setBins(30,"fft")
+          massZ.setBins(40,"fft")
+          massZErr.setBins(40,"fft")
           self.Data_Zlls_binned = self.Data_Zlls_w.binnedClone()
 
       def MakeModel_getPara(self):
@@ -157,8 +165,8 @@ class GetCorrection():
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
           #Crystalball
           mean = RooRealVar("mean","mean", 0, -1, 1)
-          alpha = RooRealVar("alpha","alpha", 1.1, 1, 50)
-          n = RooRealVar("n","n", 15, 0, 50)
+          alpha = RooRealVar("alpha","alpha", 5, 0, 10)
+          n = RooRealVar("n","n", 15, 0, 30)
           #alpha2 = RooRealVar("alpha2","alpha2", 1.2, 0, 50)
           #n2 = RooRealVar("n2","n2", 15, 0.1, 50)
           sigma = RooRealVar("sigma", "sigma", 0.1, 0, 10)
@@ -175,7 +183,7 @@ class GetCorrection():
           p2 = RooFormulaVar("p2", "@1*@0+@2*@0*@0",RooArgList(massZ,pa1,pa2))
           bkg = RooExponential("bkg","bkg", p2, tau)
           #fsig
-          fsig = RooRealVar("fsig","signal fraction", 0.7, 0.5, 0.99)#1.0)
+          fsig = RooRealVar("fsig","signal fraction", 0.7, 0.5, 1)
           model = RooAddPdf("model","model", CBxBW, bkg, fsig)
           getattr(self.w,'import')(model)
 

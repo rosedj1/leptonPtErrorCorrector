@@ -1,3 +1,2 @@
-it: 0, lambda: 1.10523192199, lambda2: 1, lambda2_next: 1.10523192199
-it: 1, lambda: 1.01971880273, lambda2: 1.10523192199, lambda2_next: 1.12702577223
-it: 2, lambda: 1.00345327021, lambda2: 1.12702577223, lambda2_next: 1.13091769676
+it: 0, lambda: 1.04717893502, lambda2: 1, lambda2_next: 1.04717893502
+it: 1, lambda: 1.00874707399, lambda2: 1.04717893502, lambda2_next: 1.05633868665
