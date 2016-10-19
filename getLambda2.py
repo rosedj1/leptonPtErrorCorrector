@@ -11,7 +11,7 @@ def ParseOption():
     parser.add_argument('--lambda1_pre', dest='lambda1_pre', type=float)
     parser.add_argument('--isData', dest='isData', action="store_true", default=False)
     parser.add_argument('--fs', dest='fs', type=str)
-
+    parser.add_argument('--doDebugPara', dest='doDEBUG_para', action="store_true",default=False)
     args = parser.parse_args()
     return args
 
@@ -31,16 +31,18 @@ lambdas = {'lambda1':lambda1_pre, 'lambda2':1}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 #shapePara = {"mean":0, "alpha":0, "n":0, "alpha2":0, "n2":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 
-path = "/home/mhl/public_html/2016/20160718_massErr_data/getLambda2/"
+path = "/home/mhl/public_html/2016/20161011_2015MCebeCorrection/getLambda2/"
 
 tag = "doLambda2_getPara_" + fs
 
 #get CB para
 getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
 
-#sys.exit()
-
 getCorr_getPara.DriverGetPara()
+
+sys.exit()
+if args.doDEBUG_para:
+   sys.exit()
 
 shapePara = getCorr_getPara.shapePara
 
@@ -72,7 +74,7 @@ while(needMoreCorr):
      savedLambda.append(tmpLambdas)
 
 
-     if abs(getCorr_getLambda.Lambdas['lambda'] - 1) < 0.01: 
+     if abs(getCorr_getLambda.Lambdas['lambda'] - 1) < 0.01 or it >= 6 : 
 
         needMoreCorr = False
 
@@ -82,7 +84,7 @@ if not args.isData:
 else:
    name += 'Data_Pt_' + str(pTLow)  + '_to_' + str(pTHigh) + '_Eta_' + str(etaLow) + '_to_' + str(etaHigh) + '_' + fs
 
-with open("../lambdas_singleCB/" + name + ".txt", "w") as myfile:
+with open("lambdas_singleCB/" + name + ".txt", "w") as myfile:
 
      for i in range(len(savedLambda)):
 
