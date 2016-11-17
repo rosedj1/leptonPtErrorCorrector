@@ -1,0 +1,195 @@
+#ifndef AnalysisTree_h
+#define AnalysisTree_h
+
+#include <TROOT.h>
+#include <TChain.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TClonesArray.h>
+
+  double mass4l, mass4mu, mass4e, mass2e2mu, massZ1, massZ2;
+  double mass4lREFIT, massZ1REFIT, mass4lTrueREFIT, massZ1TrueREFIT;
+  double GENmassZ1, GENmassZ2;
+  double l1,l2, l1True, l2True; 
+  double pterr1, pterr2, pterr1REFIT, pterr2REFIT, pterr1TrueREFIT, pterr2TrueREFIT;
+  double m4lErrorUFCorr; 
+
+  double pTL1, pTL2;
+  double pTL1_GENMatched, pTL2_GENMatched;
+  int idL1, idL2, idL3, idL4;
+
+  double pXL1, pXL2, pXL3, pXL4;
+  double pYL1, pYL2, pYL3, pYL4;
+  double pZL1, pZL2, pZL3, pZL4;
+  double EL1, EL2, EL3, EL4;
+
+  ULong64_t Run, Event, LumiSect;
+
+  ///////
+
+  int GENlepIndex1, GENlepIndex2, GENlepIndex3, GENlepIndex4;
+  TClonesArray *GENlep_p4;
+  std::vector<int> * GENlep_id;
+
+  int fsState;
+  bool FSR_Z1, FSR_Z2;
+
+  double eventMCWeight;
+
+/*
+    if( RecoFourMuEvent ){ finalState = 1;}
+    if( RecoFourEEvent  ){ finalState = 2;}
+    if( RecoTwoETwoMuEvent ){ finalState = 3;}
+    if( RecoTwoMuTwoEEvent ){ finalState = 4;}
+*/
+
+  bool passedFullSelection, passedQCDcut;
+  bool passedFiducialKinematics, passedFiducialTopology;
+ 
+  double FSRPhot1_Pt, FSRPhot2_Pt;
+
+  using namespace std;  
+
+namespace AnalysisTree {
+
+ void setAddressesRECO(TTree* tree){
+
+    tree->SetBranchAddress("Event",&Event);
+
+    tree->SetBranchAddress("passedFullSelection",&passedFullSelection);
+    tree->SetBranchAddress("passedQCDcut",&passedQCDcut);
+ 
+    tree->SetBranchAddress("FSR_Z1",&FSR_Z1);
+    tree->SetBranchAddress("FSR_Z2",&FSR_Z2);
+    tree->SetBranchAddress("FSRPhot1_Pt",&FSRPhot1_Pt);
+    tree->SetBranchAddress("FSRPhot2_Pt",&FSRPhot2_Pt);
+
+    tree->SetBranchAddress("mass4l",&mass4l);
+    tree->SetBranchAddress("mass4mu",&mass4mu);
+    tree->SetBranchAddress("mass4e",&mass4e);
+    tree->SetBranchAddress("mass2e2mu",&mass2e2mu);
+    tree->SetBranchAddress("finalState",&fsState);
+
+    tree->SetBranchAddress("pXL1",&pXL1);
+    tree->SetBranchAddress("pYL1",&pYL1);
+    tree->SetBranchAddress("pZL1",&pZL1);
+    tree->SetBranchAddress("EL1",&EL1);
+    tree->SetBranchAddress("pXL2",&pXL2);
+    tree->SetBranchAddress("pYL2",&pYL2);
+    tree->SetBranchAddress("pZL2",&pZL2);
+    tree->SetBranchAddress("EL2",&EL2);
+
+    tree->SetBranchAddress("massZ1",&massZ1);
+    tree->SetBranchAddress("GENmZ1",&GENmassZ1);
+    tree->SetBranchAddress("massZ2",&massZ2);    
+    tree->SetBranchAddress("GENmZ2",&GENmassZ2);
+
+    tree->SetBranchAddress("l1",&l1);
+    tree->SetBranchAddress("l2",&l2);
+    tree->SetBranchAddress("l1True",&l1True);
+    tree->SetBranchAddress("l2True",&l2True);
+    tree->SetBranchAddress("pTL1",&pTL1);
+    tree->SetBranchAddress("pTL2",&pTL2);
+    tree->SetBranchAddress("idL1",&idL1);
+    tree->SetBranchAddress("idL2",&idL2);
+    tree->SetBranchAddress("idL3",&idL3);
+    tree->SetBranchAddress("idL4",&idL4);
+    tree->SetBranchAddress("pTL1_GENMatched",&pTL1_GENMatched);
+    tree->SetBranchAddress("pTL2_GENMatched",&pTL2_GENMatched);
+    tree->SetBranchAddress("pterr1",&pterr1);
+    tree->SetBranchAddress("pterr2",&pterr2);
+    tree->SetBranchAddress("pterr1REFIT",&pterr1REFIT);
+    tree->SetBranchAddress("pterr2REFIT",&pterr2REFIT);
+    tree->SetBranchAddress("pterr1TrueREFIT",&pterr1TrueREFIT);
+    tree->SetBranchAddress("pterr2TrueREFIT",&pterr2TrueREFIT);
+    tree->SetBranchAddress("massErrorUFCorr",&m4lErrorUFCorr);
+
+    tree->Branch("passedFiducialKinematics",&passedFiducialKinematics);
+    tree->Branch("passedFiducialTopology",&passedFiducialTopology);
+
+    tree->SetBranchAddress("GENidLS3",&GENlep_id);
+    tree->SetBranchAddress("GENp4LS3", &GENlep_p4);
+    tree->SetBranchAddress("GENlepIndex1", &GENlepIndex1);
+    tree->SetBranchAddress("GENlepIndex2", &GENlepIndex2);
+    tree->SetBranchAddress("GENlepIndex3", &GENlepIndex3);
+    tree->SetBranchAddress("GENlepIndex4", &GENlepIndex4);
+
+    tree->SetBranchAddress("mass4lREFIT",&mass4lREFIT);
+    tree->SetBranchAddress("massZ1REFIT",&massZ1REFIT);
+
+    tree->SetBranchAddress("mass4lTrueREFIT",&mass4lTrueREFIT);
+    tree->SetBranchAddress("massZ1TrueREFIT",&massZ1TrueREFIT);
+
+    tree->SetBranchAddress("eventMCWeight",&eventMCWeight);
+
+  }
+
+
+ void setCMS(TH1F* Graph1)
+ {
+
+    Graph1->GetXaxis()->SetLabelFont(42);
+    Graph1->GetXaxis()->SetLabelOffset(0.003);
+
+    Graph1->GetXaxis()->SetLabelSize(0.035);
+
+    Graph1->GetXaxis()->SetTitleSize(0.04);
+    Graph1->GetXaxis()->SetTitleOffset(0.8);
+    Graph1->GetXaxis()->SetTitleFont(42);
+
+    Graph1->GetYaxis()->SetLabelFont(42);
+
+    Graph1->GetYaxis()->SetLabelOffset(0.004);
+    Graph1->GetYaxis()->SetLabelSize(0.035);
+    Graph1->GetYaxis()->SetTitleSize(0.04);
+    Graph1->GetYaxis()->SetTitleOffset(1.1);
+    Graph1->GetYaxis()->SetTitleFont(42);
+
+ }
+
+ void setCMS(TGraph* Graph1)
+ {
+
+    Graph1->GetXaxis()->SetLabelFont(42);
+    Graph1->GetXaxis()->SetLabelOffset(0.003);
+
+    Graph1->GetXaxis()->SetLabelSize(0.035);
+
+    Graph1->GetXaxis()->SetTitleSize(0.04);
+    Graph1->GetXaxis()->SetTitleOffset(0.8);
+    Graph1->GetXaxis()->SetTitleFont(42);
+
+    Graph1->GetYaxis()->SetLabelFont(42);
+
+    Graph1->GetYaxis()->SetLabelOffset(0.004);
+    Graph1->GetYaxis()->SetLabelSize(0.035);
+    Graph1->GetYaxis()->SetTitleSize(0.04);
+    Graph1->GetYaxis()->SetTitleOffset(1.0);
+    Graph1->GetYaxis()->SetTitleFont(42);
+
+ }
+
+ void setCMS(TH2F* Graph1)
+ {
+
+    Graph1->GetXaxis()->SetLabelFont(42);
+    Graph1->GetXaxis()->SetLabelOffset(0.003);
+
+    Graph1->GetXaxis()->SetLabelSize(0.035);
+
+    Graph1->GetXaxis()->SetTitleSize(0.04);
+    Graph1->GetXaxis()->SetTitleOffset(0.8);
+    Graph1->GetXaxis()->SetTitleFont(42);
+
+    Graph1->GetYaxis()->SetLabelFont(42);
+
+    Graph1->GetYaxis()->SetLabelOffset(0.004);
+    Graph1->GetYaxis()->SetLabelSize(0.035);
+    Graph1->GetYaxis()->SetTitleSize(0.04);
+    Graph1->GetYaxis()->SetTitleOffset(1.1);
+    Graph1->GetYaxis()->SetTitleFont(42);
+ }
+
+}
+
+#endif

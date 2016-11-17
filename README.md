@@ -1,6 +1,6 @@
-# getEBECorrection_HZZ4L
+# leptonPtErrorCorrector
 
-step to run package
+step to run doCorrection
 
 1, ./doLambda1.sh 
 
