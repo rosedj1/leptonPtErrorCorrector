@@ -133,11 +133,15 @@ using namespace std;
   double genLep_eta1=-999, genLep_eta2=-999;
   double genLep_phi1=-999, genLep_phi2=-999;
 
+  int lep1_ecalDriven = -1, lep2_ecalDriven = -1;
+
   int nFSRPhotons;
   double Met;
   float_t met;
   bool passedTrig;
   bool passedFullSelection; 
+
+  std::vector<int> *lep_ecalDriven;
 
 int main(int argc, char *argv[])
 {    
@@ -218,6 +222,9 @@ int main(int argc, char *argv[])
   newtree->Branch("genLep_phi2", &genLep_phi2, "genLep_phi2/D");
 
   newtree->Branch("nFSRPhotons", &nFSRPhotons, "nFSRPhotons/I");
+  newtree->Branch("lep1_ecalDriven", &lep1_ecalDriven, "lep1_ecalDriven/I");
+  newtree->Branch("lep2_ecalDriven", &lep2_ecalDriven, "lep2_ecalDriven/I");
+
   cout<<"start reading tree "<<endl;
 
   ReadTree(tree, fs, newtree);
@@ -318,6 +325,13 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
 
               }
 
+            if (lep_ecalDriven->size() > 0) {
+
+               lep1_ecalDriven = (*lep_ecalDriven)[L1];
+               lep2_ecalDriven = (*lep_ecalDriven)[L2];
+ 
+               }
+
             newtree->Fill();
 
         }
@@ -380,6 +394,10 @@ void setAddresses(TTree* tree){
 
     tree->SetBranchStatus("nFSRPhotons",1);
     tree->SetBranchAddress("nFSRPhotons", &nFSRPhotons);
+
+    tree->SetBranchStatus("lep_ecalDriven", 1);
+    tree->SetBranchAddress("lep_ecalDriven", &lep_ecalDriven);
+
 }
 
 
