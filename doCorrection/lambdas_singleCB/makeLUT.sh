@@ -2,5 +2,5 @@ cd /cms/data/scratch/osg/mhl/Run2/HZZ4L/PereventMassErrCorr_2016ICHEP/CMSSW_8_0_
 eval `scramv1 runtime -sh`
 
 cd -
-python makeLUT_mu.py --savePath "/home/mhl/public_html/2016/20161006_2015MCebeCorrection/"
-python makeLUT_e.py --savePath "/home/mhl/public_html/2016/20161006_2015MCebeCorrection/"
+python makeLUT_mu.py --savePath "/home/mhl/public_html/2016/20161121_mass_addMuonPtScaleCorr/getLambda1/"
+#python makeLUT_e.py --savePath "/home/mhl/public_html/2016/20161020_mass/"

@@ -30,8 +30,8 @@ f1 = TFile(file1, "RECREATE")
 f1.cd()
 fs = 'mu'
 
-Binx = [10, 40, 50, 100]
-Biny = [0, 0.9, 1.2, 2.4]
+Binx = [10, 100]
+Biny = [0, 0.9, 1.8, 2.4]
 binx,biny = array('f'),array('f')
 
 for i in range(len(Binx)):
@@ -54,18 +54,21 @@ for i in range(len(binx)-1):
         else:
            txtName = "DY_Pt_" + pTLow + "_to_" + pTHigh + "_Eta_" + etaLow + "_to_" + etaHigh + "_" + fs
 
-        print i,j, txtName, getLambda2(txtName)
+#        print i,j, txtName, getLambda2(txtName)
 
-        LUT.SetBinContent(i+1,j+1,getLambda2(txtName))
+#        LUT.SetBinContent(i+1,j+1,getLambda2(txtName))
 
-LUT.SetBinContent(3,2,1)
-#LUT.SetBinContent(3,1,1)
-#LUT.SetBinContent(2,3,1.3)
+#LUT.SetBinContent(1,1,1.18)
+#LUT.SetBinContent(1,2,1.262)
+#LUT.SetBinContent(1,3,1.069)
 
-LUT.SetBinContent(1,1,1.3)
+#LUT.SetBinContent(1,1,1.131)
+#LUT.SetBinContent(1,2,1.192)
+#LUT.SetBinContent(1,3,1.039)
 
-#print LUT.GetBinContent(3,2)
-
+LUT.SetBinContent(1,1,1.220)
+LUT.SetBinContent(1,2,1.284)
+LUT.SetBinContent(1,3,1.051)
 
 c1 = TCanvas("c1","",800,800)
 LUT.Draw("text")

@@ -1,5 +1,0 @@
-it: 0, lambda: 1.0968373299, lambda2: 1, lambda2_next: 1.0968373299
-it: 1, lambda: 1.05776688754, lambda2: 1.0968373299, lambda2_next: 1.16019820858
-it: 2, lambda: 1.03597777352, lambda2: 1.16019820858, lambda2_next: 1.20193955696
-it: 3, lambda: 1.0202592418, lambda2: 1.20193955696, lambda2_next: 1.22628994108
-it: 4, lambda: 1.00641713076, lambda2: 1.22628994108, lambda2_next: 1.23415920398
