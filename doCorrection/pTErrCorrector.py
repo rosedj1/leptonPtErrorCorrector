@@ -47,7 +47,7 @@ class GetCorrection():
           if isData:
              self.fileName = "DoubleLepton_m2" + self.fs + ".root"
 #          self.treeFile = TFile("../inputRootFiles/"+self.fileName)
-          self.treeFile = TFile("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_2015MC/HZZ4L_Mass/makeSlimTree/DY_2015MC_kalman_v4/"+self.fileName)
+          self.treeFile = TFile("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"+self.fileName)
           self.tree = self.treeFile.Get("passedEvents")
           print 'tree opened'
 
@@ -158,15 +158,15 @@ class GetCorrection():
           massZ = RooRealVar("massZ","massZ", 80, 100)
           massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
           #BreitWigner
-          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.187)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.4952)
+          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#91.14)#187)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.446)#2.406)#2.546)#4952)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
           #Crystalball
           mean = RooRealVar("mean","mean", 0, -1, 1)
-          alpha = RooRealVar("alpha","alpha", 5, 0, 10)
-          n = RooRealVar("n","n", 15, 0, 30)
+          alpha = RooRealVar("alpha","alpha", 5, 1, 10)
+          n = RooRealVar("n","n", 5, 0, 30)
           #alpha2 = RooRealVar("alpha2","alpha2", 1.2, 0, 50)
           #n2 = RooRealVar("n2","n2", 15, 0.1, 50)
           sigma = RooRealVar("sigma", "sigma", 0.1, 0, 10)
@@ -175,13 +175,15 @@ class GetCorrection():
           #GENZ shape convoluted with crystal ball
           rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
           rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
-          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
+#          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
+          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
           #bkg
           tau = RooRealVar("tau","tau",  -1, 1)
           pa1 = RooRealVar("pa1","pa1", -0.08, -10,10)
           pa2 = RooRealVar("pa2","pa2", 0.0098, -10,10)
           p2 = RooFormulaVar("p2", "@1*@0+@2*@0*@0",RooArgList(massZ,pa1,pa2))
-          bkg = RooExponential("bkg","bkg", p2, tau)
+#          bkg = RooExponential("bkg","bkg", p2, tau)
+          bkg = RooExponential("bkg","bkg", massZ, tau)
           #fsig
           fsig = RooRealVar("fsig","signal fraction", 0.7, 0.5, 1)
           model = RooAddPdf("model","model", CBxBW, bkg, fsig)
@@ -193,8 +195,8 @@ class GetCorrection():
           massZ = RooRealVar("massZ","massZ", 80, 100)
           massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
           #BreitWigner
-          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.187)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.4952)
+          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#87)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.446)#2.406)#4952)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
@@ -205,19 +207,23 @@ class GetCorrection():
           #alpha2 = RooRealVar("alpha2","alpha2", self.shapePara["alpha2"])
           #n2 = RooRealVar("n2","n2", self.shapePara["n2"])
           lambda_ = RooRealVar("lambda","lambda", 0.5, 1.5)
-          sigma = RooFormulaVar("sigma","@0*@1", RooArgList(lambda_, massZErr))
+#          sigma = RooFormulaVar("sigma","@1*(1+@2/@1*@0)", RooArgList(lambda_, massZ, massZErr))
+          sigma = RooFormulaVar("sigma","@1*@0", RooArgList(lambda_,  massZErr))
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
           #GENZ shape convoluted with crystal ball
           rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
           rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
-          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
-          #bkg
+          #CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
+          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
+
           tau = RooRealVar("tau","tau", self.shapePara["tau"])
           pa1 = RooRealVar("pa1","pa1", self.shapePara["pa1"])
           pa2 = RooRealVar("pa2","pa2", self.shapePara["pa2"])
           p2 = RooFormulaVar("p2", "@1*@0+@2*@0*@0",RooArgList(massZ,pa1,pa2))
-          bkg = RooExponential("bkg","bkg", p2, tau)
+#          bkg = RooExponential("bkg","bkg", p2, tau)
+          bkg = RooExponential("bkg","bkg", massZ, tau)
+
           #fsig
           fsig = RooRealVar("fsig","signal fraction", self.shapePara["fsig"])
           model = RooAddPdf("model","model", CBxBW, bkg, fsig)
@@ -249,8 +255,8 @@ class GetCorrection():
 #          self.shapePara["alpha2"] = self.w.var("alpha2").getVal()
 #          self.shapePara["n2"] = self.w.var("n2").getVal()
           self.shapePara["tau"] = self.w.var("tau").getVal()
-          self.shapePara["pa1"] = self.w.var("pa1").getVal()
-          self.shapePara["pa2"] = self.w.var("pa2").getVal()
+#          self.shapePara["pa1"] = self.w.var("pa1").getVal()
+#          self.shapePara["pa2"] = self.w.var("pa2").getVal()
           self.shapePara["fsig"] = self.w.var("fsig").getVal()
 
       def AfterFit_getLambda(self):
@@ -297,8 +303,8 @@ class GetCorrection():
              latex.DrawLatex(0.75, 0.8, "alpha = %.3f" %(self.w.var("alpha").getVal()))
              latex.DrawLatex(0.75, 0.75, "fsig = %.3f" %(self.w.var("fsig").getVal()))
              latex.DrawLatex(0.75, 0.7, "n = %.3f" %(self.w.var("n").getVal()))
-             latex.DrawLatex(0.75, 0.65, "pa1 = %.3f" %(self.w.var("pa1").getVal()))
-             latex.DrawLatex(0.75, 0.6, "pa2 = %.3f" %(self.w.var("pa2").getVal()))
+#             latex.DrawLatex(0.75, 0.65, "pa1 = %.3f" %(self.w.var("pa1").getVal()))
+#             latex.DrawLatex(0.75, 0.6, "pa2 = %.3f" %(self.w.var("pa2").getVal()))
              latex.DrawLatex(0.75, 0.55, "sigma = %.3f" %(self.w.function("sigma").getVal()))
              latex.DrawLatex(0.75, 0.5, "tau = %.3f" %(self.w.var("tau").getVal()))
 
@@ -342,8 +348,8 @@ class GetCorrection():
 
           lep1p = TLorentzVector(0,0,0,0)
           lep2p = TLorentzVector(0,0,0,0)
-          lep1p.SetPtEtaPhiM(pT1+pterr1*corr1,(eta1),(phi1),m1)
-          lep2p.SetPtEtaPhiM(pT2+pterr2*corr2,(eta2),(phi2),m2)
+          lep1p.SetPtEtaPhiM(pT1*(1+pterr1*corr1),(eta1),(phi1),m1)
+          lep2p.SetPtEtaPhiM(pT2*(1+pterr2*corr2),(eta2),(phi2),m2)
 
           dm1 = (lep1p+lep2).M()-(lep1+lep2).M()
           dm2 = (lep1+lep2p).M()-(lep1+lep2).M()
