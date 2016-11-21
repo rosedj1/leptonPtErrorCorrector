@@ -151,8 +151,8 @@ int main(int argc, char *argv[])
      
   using namespace std;
      
-  if(argc != 4)  {
-      cout<<argv[0]<<" filename "<<argv[1]<<" fs "<<argv[2]<<" outdir" <<argv[3]<<endl;
+  if(argc != 5)  {
+      cout<<argv[0]<<" filename "<<argv[1]<<" fs "<<argv[2]<< " indir " << argv[3] << " outdir" <<argv[4]<<endl;
       return -1;
     }
 
@@ -168,7 +168,8 @@ int main(int argc, char *argv[])
 
   TString filename = argv[1];
   TString fs = argv[2];
-  TString outdir = argv[3];
+  TString indir = argv[3];
+  TString outdir = argv[4];
   if(fs!="2e" && fs!="2mu")
   cout<<"fs has to be 2e, or 2mu"<<endl;
 
@@ -178,7 +179,8 @@ int main(int argc, char *argv[])
 
   cout<<"read file"<<endl;
 
-  TFile* infile = new TFile("inputRootBeforeSkim/" + filename+".root");
+  TFile* infile = new TFile(indir+filename+".root");
+//  TFile* infile = new TFile("inputRootBeforeSkim/" + filename+".root");
 //  TFile* infile = new TFile("/cms/data/store/user/t2/users/dsperka/Run2/HZZ4l/SubmitArea_13TeV/rootfiles_Run1Fid_20160222/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1.root");
   TTree* tree; 
 
