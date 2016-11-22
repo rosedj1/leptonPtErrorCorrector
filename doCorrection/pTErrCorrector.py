@@ -36,9 +36,10 @@ class GetCorrection():
           self.fs = fs
           self.doLambda1 = doLambda1
           #cut to make dataset
-          self.cut = " (massZ > 80 && massZ < 100) && " 
-          self.cut += " (massZErr > 0.2 && massZErr < 7.2) && "
-          self.cut += " (Met < 30 && GENmass2l > 0) && "
+          self.cut = " (massZ > 80 && massZ < 100) && "
+          self.cut = " (genzm > 80 && genzm < 100) && " 
+#          self.cut += " (massZErr > 0.2 && massZErr < 7.2) && "
+#          self.cut += " (Met < 30 && GENmass2l > 0) && "
           self.doLambdaCut() # doLambda1Cut or doLambda2Cut
 
           #tree to get information
@@ -91,7 +92,8 @@ class GetCorrection():
       def PrepareDataset(self):
 
           weight = RooRealVar("weight","weight", 0.00001, 100)
-          massZ = RooRealVar("massZ","massZ", 80, 100)
+          massZ = RooRealVar("massZ","massZ",80, 100)
+#          massZ = RooRealVar("massZ","massZ", 60, 120)
           massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
           rastmp = RooArgSet(massZ, massZErr, weight)
           self.Data_Zlls = RooDataSet("Zlls","Zlls", rastmp)
@@ -102,8 +104,9 @@ class GetCorrection():
 
               self.tree.GetEntry(i)
               if not (self.tree.massZ > 80 and self.tree.massZ < 100): continue
-              if not (self.tree.massZErr > 0.2 and self.tree.massZErr < 7.2): continue
-              if self.tree.Met > 30: continue
+              if not (self.tree.genzm > 80 and self.tree.genzm < 100): continue
+#              if not (self.tree.massZErr > 0.2 and self.tree.massZErr < 7.2): continue
+#              if self.tree.Met > 30: continue
 
               lepInBin = {'lep1InBin1':False, 'lep2InBin1':False, 'lep1InBin2':False, 'lep2InBin2':False}
 
@@ -156,25 +159,26 @@ class GetCorrection():
 
           #variables
           massZ = RooRealVar("massZ","massZ", 80, 100)
+#          massZ = RooRealVar("massZ","massZ", 60, 120)
           massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
           #BreitWigner
           breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#91.14)#187)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.446)#2.406)#2.546)#4952)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.406)#2.546)#4952)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
           #Crystalball
           mean = RooRealVar("mean","mean", 0, -1, 1)
-          alpha = RooRealVar("alpha","alpha", 5, 1, 10)
-          n = RooRealVar("n","n", 5, 0, 30)
+          alpha = RooRealVar("alpha","alpha", 1, 1, 10)
+          n = RooRealVar("n","n", 5, 1, 30)
           #alpha2 = RooRealVar("alpha2","alpha2", 1.2, 0, 50)
           #n2 = RooRealVar("n2","n2", 15, 0.1, 50)
           sigma = RooRealVar("sigma", "sigma", 0.1, 0, 10)
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
           #GENZ shape convoluted with crystal ball
-          rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
-          rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
+#          rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
+#          rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
 #          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
           CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
           #bkg
@@ -193,10 +197,11 @@ class GetCorrection():
 
           #variables
           massZ = RooRealVar("massZ","massZ", 80, 100)
+#          massZ = RooRealVar("massZ","massZ", 60, 120)
           massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
           #BreitWigner
           breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#87)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.446)#2.406)#4952)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.406)#4952)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
@@ -212,8 +217,8 @@ class GetCorrection():
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
           #GENZ shape convoluted with crystal ball
-          rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
-          rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
+#          rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
+#          rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
           #CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
           CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
 
@@ -386,18 +391,25 @@ class GetCorrection():
          print 'dataset made'
          self.MakeModel_getPara()
          print 'model made'
+
+         self.w.Print()
+
          self.DoFit_getPara()
          print 'fit done'
          self.AfterFit_getPara()
          print 'parameter got'
          self.PlotFit()
          print 'plot made'
-
+ 
+         
       def DriverGetLambda(self):
 
 #         self.MakeSmallTree()
          self.PrepareDataset()
          self.MakeModel_getLambda()
+
+         self.w.Print()
+
          self.DoFit_getLambda()
          self.AfterFit_getLambda()
          self.PlotFit()

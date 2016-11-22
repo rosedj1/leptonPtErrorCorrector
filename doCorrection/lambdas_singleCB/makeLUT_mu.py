@@ -66,9 +66,9 @@ for i in range(len(binx)-1):
 #LUT.SetBinContent(1,2,1.192)
 #LUT.SetBinContent(1,3,1.039)
 
-LUT.SetBinContent(1,1,1.220)
-LUT.SetBinContent(1,2,1.284)
-LUT.SetBinContent(1,3,1.051)
+LUT.SetBinContent(1,1,1.230)
+LUT.SetBinContent(1,2,1.273)
+LUT.SetBinContent(1,3,1.075)
 
 c1 = TCanvas("c1","",800,800)
 LUT.Draw("text")

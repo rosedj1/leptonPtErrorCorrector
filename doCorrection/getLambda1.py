@@ -29,7 +29,7 @@ lambdas = {'lambda1':1, 'lambda2':1}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 #shapePara = {"mean":0, "alpha":0, "n":0, "alpha2":0, "n2":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 
-path = "/home/mhl/public_html/2016/20161121_mass_addMuonPtScaleCorr/getLambda1/"
+path = "/home/mhl/public_html/2016/20161121_mass_addMuonPtScaleCorr/getLambda1_testCut/"
 
 tag = "doLambda1_getPara_" + fs
 
