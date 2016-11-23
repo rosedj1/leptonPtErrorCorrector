@@ -1,0 +1,163 @@
+#define MySelector_cxx
+// The class definition in MySelector.h has been generated automatically
+// by the ROOT utility TTree::MakeSelector(). This class is derived
+// from the ROOT class TSelector. For more information on the TSelector
+// framework see $ROOTSYS/README/README.SELECTOR or the ROOT User Manual.
+
+
+// The following methods are defined in this file:
+//    Begin():        called every time a loop on the tree starts,
+//                    a convenient place to create your histograms.
+//    SlaveBegin():   called after Begin(), when on PROOF called only on the
+//                    slave servers.
+//    Process():      called for each event, in this function you decide what
+//                    to read and fill your histograms.
+//    SlaveTerminate: called at the end of the loop on the tree, when on PROOF
+//                    called only on the slave servers.
+//    Terminate():    called at the end of the loop on the tree,
+//                    a convenient place to draw/fit your histograms.
+//
+// To use this file, try the following session on your Tree T:
+//
+// root> T->Process("MySelector.C")
+// root> T->Process("MySelector.C","some options")
+// root> T->Process("MySelector.C+")
+//
+
+
+#include "MySelector.h"
+#include <TH2.h>
+#include <TStyle.h>
+
+/*MySelector::MySelector( ) {
+
+//     rv_weight = 0;
+     rv_massZ = 0;
+     rv_massZErr = 0;
+     rastmp = 0;
+     Data_Zlls = 0;
+
+}
+
+MySelector::~MySelector( ) {}
+*/
+
+
+
+void MySelector::Begin(TTree * /*tree*/)
+{
+   // The Begin() function is called at the start of the query.
+   // When running with PROOF Begin() is only called on the client.
+   // The tree argument is deprecated (on PROOF 0 is passed).
+
+   TString option = GetOption();
+
+   rv_weight = new RooRealVar("weight","weight", 0.00001, 100);
+   rv_massZ = new RooRealVar("massZ","massZ",60, 120);
+   rv_massZErr = new RooRealVar("massZErr","massZErr", 0.2, 7.2);
+   rastmp = new RooArgSet(*rv_massZ, *rv_massZErr, *rv_weight);
+   Data_Zlls = new RooDataSet("Zlls","Zlls", *rastmp);
+
+   rv_massZ->setBins(50,"fft");
+   rv_massZErr->setBins(50,"fft");
+
+//   fOutput->Add(Data_Zlls);
+
+}
+
+void MySelector::SlaveBegin(TTree * /*tree*/)
+{
+   // The SlaveBegin() function is called after the Begin() function.
+   // When running with PROOF SlaveBegin() is called on each slave server.
+   // The tree argument is deprecated (on PROOF 0 is passed).
+
+   TString option = GetOption();
+/*
+   TParameter<int>* DoLambda1 = (TParameter<int>*)fInput->FindObject("doLambda1");
+   TParameter<float>* Lambda1 = (TParameter<float>*)fInput->FindObject("lambda1");
+   TParameter<float>* Lambda2 = (TParameter<float>*)fInput->FindObject("lambda2");
+
+   doLambda1 = DoLambda1->GetVal();
+   lambda1 = Lambda1->GetVal();
+   lambda2 = Lambda2->GetVal();
+
+   cout << "here1" << endl;
+*/
+}
+
+Bool_t MySelector::Process(Long64_t entry)
+{
+   // The Process() function is called for each entry in the tree (or possibly
+   // keyed object in the case of PROOF) to be processed. The entry argument
+   // specifies which entry in the currently loaded tree is to be processed.
+   // When processing keyed objects with PROOF, the object is already loaded
+   // and is available via the fObject pointer.
+   //
+   // This function should contain the \"body\" of the analysis. It can contain
+   // simple or elaborate selection criteria, run algorithms on the data
+   // of the event and typically fill histograms.
+   //
+   // The processing can be stopped by calling Abort().
+   //
+   // Use fStatus to set the return value of TTree::Process().
+   //
+   // The return value is currently not used.
+
+   fReader.SetEntry(entry);
+
+
+   doLambda1 = 1; 
+   lambda1 = 1; 
+   lambda2 = 1; 
+
+
+   rv_massZ->setVal(*massZ);
+   rv_weight->setVal(*weight);
+  
+   if (doLambda1 == 1) {
+
+      rv_massZErr->setVal(*massZErr);
+
+      } else {
+
+             TLorentzVector lep1 = TLorentzVector(0,0,0,0);
+             TLorentzVector lep2 = TLorentzVector(0,0,0,0);
+             lep1.SetPtEtaPhiM(*pT1,*eta1,*phi1,*m1);
+             lep2.SetPtEtaPhiM(*pT2,*eta2,*phi2,*m2);
+
+             TLorentzVector lep1p = TLorentzVector(0,0,0,0);
+             TLorentzVector lep2p = TLorentzVector(0,0,0,0);
+             lep1p.SetPtEtaPhiM( (*pT1)+(*pterr1)*lambda1, *eta1, *phi1, *m1);
+             lep2p.SetPtEtaPhiM( (*pT2)+(*pterr2)*lambda2, *eta2, *phi2, *m2);
+
+             double dm1 = (lep1p+lep2).M()-(lep1+lep2).M();
+             double dm2 = (lep1+lep2p).M()-(lep1+lep2).M();
+
+             double new_massZErr = TMath::Sqrt(dm1*dm1+dm2*dm2);
+             rv_massZErr->setVal(new_massZErr);              
+
+             }
+
+//   rv_massZ->setBins(40,"fft");
+//   rv_massZErr->setBins(40,"fft");
+
+   Data_Zlls->add(*rastmp);
+
+   return kTRUE;
+}
+
+void MySelector::SlaveTerminate()
+{
+   // The SlaveTerminate() function is called after all entries or objects
+   // have been processed. When running with PROOF SlaveTerminate() is called
+   // on each slave server.
+
+}
+
+void MySelector::Terminate()
+{
+   // The Terminate() function is the last function to be called during
+   // a query. It always runs on the client, it can be used to present
+   // the results graphically or save the results to file.
+
+}

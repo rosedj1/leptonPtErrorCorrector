@@ -29,7 +29,7 @@ lambdas = {'lambda1':1, 'lambda2':1}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 #shapePara = {"mean":0, "alpha":0, "n":0, "alpha2":0, "n2":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 
-path = "/home/mhl/public_html/2016/20161122_mass/getLambda1_e/"
+path = "/home/mhl/public_html/2016/20161123_mass/test/"
 
 tag = "doLambda1_getPara_" + fs
 
@@ -38,10 +38,11 @@ getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePa
 getCorr_getPara.DriverGetPara()
 
 shapePara = getCorr_getPara.shapePara
+del getCorr_getPara
+
 tag = "doLambda1_getLambda_" + fs
 
 #get lambda
 getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
 getCorr_getLambda.DriverGetLambda()
-
 
