@@ -12,10 +12,10 @@ class GetCorrection():
       def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag):
 
           if not doLambda1:
-             self.pTLow_1st = {'e': 40, 'mu': 40}
-             self.pTHigh_1st = {'e': 50, 'mu': 50}
+             self.pTLow_1st = {'e': 7, 'mu': 40}
+             self.pTHigh_1st = {'e': 100, 'mu': 50}
              self.etaLow_1st = {'e': 0, 'mu': 0}
-             self.etaHigh_1st = {'e': 0.7, 'mu': 0.9}
+             self.etaHigh_1st = {'e': 1, 'mu': 0.9}
           else:
              self.pTLow_1st = {'e': binEdge['pTLow'], 'mu': binEdge['pTLow']}
              self.pTHigh_1st = {'e': binEdge['pTHigh'], 'mu': binEdge['pTHigh']}
@@ -38,7 +38,7 @@ class GetCorrection():
           #cut to make dataset
           self.cut = " (massZ > 80 && massZ < 100) && "
           self.cut = " (genzm > 80 && genzm < 100) && " 
-#          self.cut += " (massZErr > 0.2 && massZErr < 7.2) && "
+          self.cut += " (massZErr > 0.2 && massZErr < 7.2) && "
 #          self.cut += " (Met < 30 && GENmass2l > 0) && "
           self.doLambdaCut() # doLambda1Cut or doLambda2Cut
 
@@ -105,7 +105,7 @@ class GetCorrection():
               self.tree.GetEntry(i)
               if not (self.tree.massZ > 80 and self.tree.massZ < 100): continue
               if not (self.tree.genzm > 80 and self.tree.genzm < 100): continue
-#              if not (self.tree.massZErr > 0.2 and self.tree.massZErr < 7.2): continue
+              if not (self.tree.massZErr > 0.2 and self.tree.massZErr < 7.2): continue
 #              if self.tree.Met > 30: continue
 
               lepInBin = {'lep1InBin1':False, 'lep2InBin1':False, 'lep1InBin2':False, 'lep2InBin2':False}
@@ -163,17 +163,17 @@ class GetCorrection():
           massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
           #BreitWigner
           breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#91.14)#187)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.406)#2.546)#4952)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.371)#2.546)#4952)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
           #Crystalball
           mean = RooRealVar("mean","mean", 0, -1, 1)
-          alpha = RooRealVar("alpha","alpha", 1, 1, 10)
-          n = RooRealVar("n","n", 5, 1, 30)
+          alpha = RooRealVar("alpha","alpha", 1, 0, 10)
+          n = RooRealVar("n","n", 5, 0, 30)
           #alpha2 = RooRealVar("alpha2","alpha2", 1.2, 0, 50)
           #n2 = RooRealVar("n2","n2", 15, 0.1, 50)
-          sigma = RooRealVar("sigma", "sigma", 0.1, 0, 10)
+          sigma = RooRealVar("sigma", "sigma", 1, 0, 10)
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
           #GENZ shape convoluted with crystal ball
@@ -201,7 +201,7 @@ class GetCorrection():
           massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
           #BreitWigner
           breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#87)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.406)#4952)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.371)#4952)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
@@ -211,7 +211,7 @@ class GetCorrection():
           n = RooRealVar("n","n", self.shapePara["n"])
           #alpha2 = RooRealVar("alpha2","alpha2", self.shapePara["alpha2"])
           #n2 = RooRealVar("n2","n2", self.shapePara["n2"])
-          lambda_ = RooRealVar("lambda","lambda", 0.5, 1.5)
+          lambda_ = RooRealVar("lambda","lambda", 1, 0.7, 1.3)
 #          sigma = RooFormulaVar("sigma","@1*(1+@2/@1*@0)", RooArgList(lambda_, massZ, massZErr))
           sigma = RooFormulaVar("sigma","@1*@0", RooArgList(lambda_,  massZErr))
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
@@ -353,8 +353,8 @@ class GetCorrection():
 
           lep1p = TLorentzVector(0,0,0,0)
           lep2p = TLorentzVector(0,0,0,0)
-          lep1p.SetPtEtaPhiM(pT1*(1+pterr1*corr1),(eta1),(phi1),m1)
-          lep2p.SetPtEtaPhiM(pT2*(1+pterr2*corr2),(eta2),(phi2),m2)
+          lep1p.SetPtEtaPhiM(pT1+pterr1*corr1,(eta1),(phi1),m1)
+          lep2p.SetPtEtaPhiM(pT2+pterr2*corr2,(eta2),(phi2),m2)
 
           dm1 = (lep1p+lep2).M()-(lep1+lep2).M()
           dm2 = (lep1+lep2p).M()-(lep1+lep2).M()
