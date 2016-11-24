@@ -29,19 +29,13 @@
 #include <TH2.h>
 #include <TStyle.h>
 
-/*MySelector::MySelector( ) {
+void MySelector::SetRange_massZ(double low, double high) { massZ_lo = low; massZ_hi = high;}
+void MySelector::SetRange_massZErr(double low, double high) { massZErr_lo = low; massZErr_hi = high;}
+void MySelector::SetLambda(int doLambda1_, double lambda1_, double lambda2_) {
 
-//     rv_weight = 0;
-     rv_massZ = 0;
-     rv_massZErr = 0;
-     rastmp = 0;
-     Data_Zlls = 0;
+     doLambda1 = doLambda1_; lambda1 = lambda1_; lambda2 = lambda2_;
 
-}
-
-MySelector::~MySelector( ) {}
-*/
-
+     }
 
 
 void MySelector::Begin(TTree * /*tree*/)
@@ -53,15 +47,13 @@ void MySelector::Begin(TTree * /*tree*/)
    TString option = GetOption();
 
    rv_weight = new RooRealVar("weight","weight", 0.00001, 100);
-   rv_massZ = new RooRealVar("massZ","massZ",60, 120);
-   rv_massZErr = new RooRealVar("massZErr","massZErr", 0.2, 7.2);
+   rv_massZ = new RooRealVar("massZ","massZ", massZ_lo, massZ_hi);
+   rv_massZErr = new RooRealVar("massZErr","massZErr", massZErr_lo, massZErr_hi);
    rastmp = new RooArgSet(*rv_massZ, *rv_massZErr, *rv_weight);
    Data_Zlls = new RooDataSet("Zlls","Zlls", *rastmp);
 
    rv_massZ->setBins(50,"fft");
    rv_massZErr->setBins(50,"fft");
-
-//   fOutput->Add(Data_Zlls);
 
 }
 
@@ -106,10 +98,10 @@ Bool_t MySelector::Process(Long64_t entry)
    fReader.SetEntry(entry);
 
 
-   doLambda1 = 1; 
+/*   doLambda1 = 1; 
    lambda1 = 1; 
    lambda2 = 1; 
-
+*/
 
    rv_massZ->setVal(*massZ);
    rv_weight->setVal(*weight);

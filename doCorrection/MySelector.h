@@ -65,26 +65,16 @@ public :
    RooDataSet* Data_Zlls;    
 
    int doLambda1;
-   float lambda1;
-   float lambda2;
+   double lambda1;
+   double lambda2;
+   
+   double massZ_lo, massZ_hi;
+   double massZErr_lo, massZErr_hi;
 
    MySelector(TTree * /*tree*/ =0):
-     rv_weight(0), rv_massZ(0), rv_massZErr(0), rastmp(0), Data_Zlls(0)  { 
-
-/*
-     rv_weight = RooRealVar("weight","weight", 0.00001, 100);
-     rv_massZ = RooRealVar("massZ","massZ",40, 120);
-     rv_massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2);
-     rastmp = RooArgSet(rv_massZ, rv_massZErr, rv_weight);
-     Data_Zlls = RooDataSet("Zlls","Zlls", rastmp);
-*/
-   }
-
+     rv_weight(0), rv_massZ(0), rv_massZErr(0), rastmp(0), Data_Zlls(0) {}
 
    virtual ~MySelector() {}
-
-//   MySelector();
-//   ~MySelector();
    virtual Int_t   Version() const { return 2; }
    virtual void    Begin(TTree *tree);
    virtual void    SlaveBegin(TTree *tree);
@@ -98,6 +88,10 @@ public :
    virtual TList  *GetOutputList() const { return fOutput; }
    virtual void    SlaveTerminate();
    virtual void    Terminate();
+
+   void SetRange_massZ(double low, double high);
+   void SetRange_massZErr(double low, double high);
+   void SetLambda(int doLambda1_, double lambda1_, double lambda2_);
 
    ClassDef(MySelector,1);
 

@@ -9,7 +9,7 @@ setTDRStyle()
 
 class GetCorrection():
 
-      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag):
+      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
 
           if not doLambda1:
              self.pTLow_1st = {'e': 7, 'mu': 40}
@@ -22,7 +22,13 @@ class GetCorrection():
              self.etaLow_1st = {'e': binEdge['etaLow'], 'mu': binEdge['etaLow']}
              self.etaHigh_1st = {'e': binEdge['etaHigh'], 'mu': binEdge['etaHigh']}
 
-          #can also set first bin as dict
+          self.massZ_lo = 60
+          self.massZ_hi = 120
+          self.massZErr_lo = 0.2
+          self.massZErr_hi = 7.2
+
+          self.GENZ_mean = 91.2
+          self.GENZ_width = 2.446
 
           self.pTLow = binEdge['pTLow']
           self.pTHigh = binEdge['pTHigh']
@@ -33,16 +39,12 @@ class GetCorrection():
                           'lambda2': lambdas['lambda2'],
                           'lambda': 1}
 
-          self.massZ_lo = 60
-          self.massZ_hi = 120
-
           self.fs = fs
           self.doLambda1 = doLambda1
           #cut to make dataset
           self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
-#          self.cut += " (genzm > 80 && genzm < 100) && " 
-          self.cut += " (massZErr > 0.2 && massZErr < 7.2) && "
-#          self.cut += " (Met < 30 && GENmass2l > 0) && "
+          self.cut += " (massZErr > "+str(self.massZErr_lo)+" && massZErr < "+str(self.massZErr_hi)+") && "
+
           self.doLambdaCut() # doLambda1Cut or doLambda2Cut
 
           #tree to get information
@@ -50,40 +52,21 @@ class GetCorrection():
           self.fileName = "DYJetsToLL_M-50_kalman_v4_m2" + self.fs + ".root"
           if isData:
              self.fileName = "DoubleLepton_m2" + self.fs + ".root"
-#          self.treeFile = TFile("../inputRootFiles/"+self.fileName)
 
-          self.treeFile = TFile("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"+self.fileName)
+#          self.treeFile = TFile("../inputRootFiles/"+self.fileName)
+#          self.treeFile = TFile("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"+self.fileName)
+          self.treeFile = TFile(paths['input']+self.fileName)
+
           self.tree = self.treeFile.Get("passedEvents")
-          self.chain = TChain("passedEvents")
-          self.chain.Add("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"+self.fileName)
           print 'tree opened'
 
           #save
-          self.path = path
+          self.path = paths['output']
           self.name = (self.fileName.split('.'))[0]
           self.name += "_Pt_" + str(self.pTLow)  + "_to_" + str(self.pTHigh) + "_Eta_" + str(self.etaLow) + "_to_" + str(self.etaHigh)
           self.name += "_" + tag
 
           self.tag = tag
-
-          '''
-          self.hgenzm = TH1F("hgenzm","hgenzm",200,80,100)
-#used for data
-          if isData:
-             tmpName = self.name.replace("DoubleLepton","DYJetsToLL_M-50").replace(self.tag, "doLambda2_getPara_" + fs)
-             genzmFile = TFile("genZShape/" + tmpName + "_genZShape.root")
-             tmp_hgenzm = genzmFile.Get("hgenzm")
-             for i in range(tmp_hgenzm.GetSize()-1):
-                 if i >= 1:
-                    self.hgenzm.SetBinContent(i, tmp_hgenzm.GetBinContent(i))
-#used for mc
-          else:
-             self.tree.Project(self.hgenzm.GetName(), "GENmass2l", "weight*(" + self.cut + ")")
-             genzmFile = TFile("genZShape/" + self.name + "_genZShape.root", "RECREATE")
-             genzmFile.cd()
-             self.hgenzm.Write()
-             genzmFile.Close()
-          '''
 
           #initial shape parameters
           self.shapePara = shapePara
@@ -100,47 +83,33 @@ class GetCorrection():
       def PrepareDataset(self):
 
           cut = self.cut
-#          self.chain.Draw(">>myList", cut, "entrylist")
-#          entryList = gDirectory.Get("myList")
-#          self.chain.SetEntryList(entryList)
-          print cut
           self.tree.Draw(">>myList", cut, "entrylist")
           entryList = gDirectory.Get("myList")
           self.tree.SetEntryList(entryList)
 
-#          p0 = TParameter(int)( "doLambda1", int(self.doLambda1) )
-#          p1 = TParameter(float)( "lambda1", self.Lambdas['lambda1'] )
-#          p2 = TParameter(float)( "lambda2", self.Lambdas['lambda2'] )
-
-#          proof = TProof.Open("")
-#          proof.AddInput(p0)
-#          proof.AddInput(p1)
-#          proof.AddInput(p2)
-
           selector = TSelector.GetSelector("MySelector.C+")
-#          self.chain.SetProof()
+
+          selector.SetRange_massZ(self.massZ_lo, self.massZ_hi)
+          selector.SetRange_massZErr(self.massZErr_lo, self.massZErr_hi)
+          selector.SetLambda(int(self.doLambda1), self.Lambdas["lambda1"], self.Lambdas["lambda2"])
+
           self.tree.Process(selector)
-#          self.chain.Process(selector)
 
           self.Data_Zlls = selector.Data_Zlls
 
           self.Data_Zlls_w = RooDataSet(self.Data_Zlls.GetName(), self.Data_Zlls.GetTitle(), self.Data_Zlls, self.Data_Zlls.get(), "1", "weight")
           print "dataset has " + str(self.Data_Zlls_w.numEntries()) + " events"
 
-#          massZ.setBins(40,"fft")
-#          massZErr.setBins(40,"fft")
           self.Data_Zlls_binned = self.Data_Zlls_w.binnedClone()
-          del selector
 
       def MakeModel_getPara(self):
 
           #variables
           massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
-#          massZ = RooRealVar("massZ","massZ", 60, 120)
-          massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
+          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
           #BreitWigner
-          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#91.14)#187)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.446)#2.546)#4952)
+          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", self.GENZ_mean)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", self.GENZ_width)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
@@ -174,11 +143,10 @@ class GetCorrection():
 
           #variables
           massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
-#          massZ = RooRealVar("massZ","massZ", 60, 120)
-          massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
+          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
           #BreitWigner
-          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#87)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.446)#4952)
+          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", self.GENZ_mean)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", self.GENZ_width)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
@@ -254,7 +222,7 @@ class GetCorrection():
 
       def PlotFit(self):
 
-          PmassZ = self.w.var("massZ").frame(RooFit.Bins(50))
+          PmassZ = self.w.var("massZ").frame(RooFit.Bins(100))
           PmassZ.GetXaxis().SetTitle("massZ(GeV)")
           PmassZ.GetYaxis().SetTitleOffset(1.3)
 
