@@ -8,6 +8,6 @@ cd ..
 make clean
 make
 #python run80XAnaZZ4L.py
-cd /raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_2015MC/HZZ4L_Mass/macro_13TeV_KinZfitter_mZ
-./doClousre.sh
+#cd /raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_2015MC/HZZ4L_Mass/macro_13TeV_KinZfitter_mZ
+#./doClousre.sh
 #echo "closure plot done" > exp.log

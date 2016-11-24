@@ -29,7 +29,13 @@ lambdas = {'lambda1':1, 'lambda2':1}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 #shapePara = {"mean":0, "alpha":0, "n":0, "alpha2":0, "n2":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 
+<<<<<<< HEAD
+path = {}
+path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"
+path['output'] = "/home/mhl/public_html/2016/20161123_mass/test/"
+=======
 path = "/home/mhl/public_html/2016/20161121_mass_addMuonPtScaleCorr/getLambda1/"
+>>>>>>> origin/master
 
 tag = "doLambda1_getPara_" + fs
 
@@ -38,10 +44,11 @@ getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePa
 getCorr_getPara.DriverGetPara()
 
 shapePara = getCorr_getPara.shapePara
+del getCorr_getPara
+
 tag = "doLambda1_getLambda_" + fs
 
 #get lambda
 getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
 getCorr_getLambda.DriverGetLambda()
-
 

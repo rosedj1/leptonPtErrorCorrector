@@ -9,20 +9,26 @@ setTDRStyle()
 
 class GetCorrection():
 
-      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag):
+      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
 
           if not doLambda1:
-             self.pTLow_1st = {'e': 40, 'mu': 40}
-             self.pTHigh_1st = {'e': 50, 'mu': 50}
+             self.pTLow_1st = {'e': 7, 'mu': 40}
+             self.pTHigh_1st = {'e': 100, 'mu': 50}
              self.etaLow_1st = {'e': 0, 'mu': 0}
-             self.etaHigh_1st = {'e': 0.7, 'mu': 0.9}
+             self.etaHigh_1st = {'e': 1, 'mu': 0.9}
           else:
              self.pTLow_1st = {'e': binEdge['pTLow'], 'mu': binEdge['pTLow']}
              self.pTHigh_1st = {'e': binEdge['pTHigh'], 'mu': binEdge['pTHigh']}
              self.etaLow_1st = {'e': binEdge['etaLow'], 'mu': binEdge['etaLow']}
              self.etaHigh_1st = {'e': binEdge['etaHigh'], 'mu': binEdge['etaHigh']}
 
-          #can also set first bin as dict
+          self.massZ_lo = 60
+          self.massZ_hi = 120
+          self.massZErr_lo = 0.2
+          self.massZErr_hi = 7.2
+
+          self.GENZ_mean = 91.2
+          self.GENZ_width = 2.446
 
           self.pTLow = binEdge['pTLow']
           self.pTHigh = binEdge['pTHigh']
@@ -36,9 +42,9 @@ class GetCorrection():
           self.fs = fs
           self.doLambda1 = doLambda1
           #cut to make dataset
-          self.cut = " (massZ > 80 && massZ < 100) && " 
-          self.cut += " (massZErr > 0.2 && massZErr < 7.2) && "
-          self.cut += " (Met < 30 && GENmass2l > 0) && "
+          self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
+          self.cut += " (massZErr > "+str(self.massZErr_lo)+" && massZErr < "+str(self.massZErr_hi)+") && "
+
           self.doLambdaCut() # doLambda1Cut or doLambda2Cut
 
           #tree to get information
@@ -46,35 +52,25 @@ class GetCorrection():
           self.fileName = "DYJetsToLL_M-50_kalman_v4_m2" + self.fs + ".root"
           if isData:
              self.fileName = "DoubleLepton_m2" + self.fs + ".root"
+
 #          self.treeFile = TFile("../inputRootFiles/"+self.fileName)
+<<<<<<< HEAD
+#          self.treeFile = TFile("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"+self.fileName)
+          self.treeFile = TFile(paths['input']+self.fileName)
+
+=======
           self.treeFile = TFile("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"+self.fileName)
+>>>>>>> origin/master
           self.tree = self.treeFile.Get("passedEvents")
           print 'tree opened'
 
           #save
-          self.path = path
+          self.path = paths['output']
           self.name = (self.fileName.split('.'))[0]
           self.name += "_Pt_" + str(self.pTLow)  + "_to_" + str(self.pTHigh) + "_Eta_" + str(self.etaLow) + "_to_" + str(self.etaHigh)
           self.name += "_" + tag
 
           self.tag = tag
-
-          self.hgenzm = TH1F("hgenzm","hgenzm",200,80,100)
-#used for data
-          if isData:
-             tmpName = self.name.replace("DoubleLepton","DYJetsToLL_M-50").replace(self.tag, "doLambda2_getPara_" + fs)
-             genzmFile = TFile("genZShape/" + tmpName + "_genZShape.root")
-             tmp_hgenzm = genzmFile.Get("hgenzm")
-             for i in range(tmp_hgenzm.GetSize()-1):
-                 if i >= 1:
-                    self.hgenzm.SetBinContent(i, tmp_hgenzm.GetBinContent(i))
-#used for mc
-          else:
-             self.tree.Project(self.hgenzm.GetName(), "GENmass2l", "weight*(" + self.cut + ")")
-             genzmFile = TFile("genZShape/" + self.name + "_genZShape.root", "RECREATE")
-             genzmFile.cd()
-             self.hgenzm.Write()
-             genzmFile.Close()
 
           #initial shape parameters
           self.shapePara = shapePara
@@ -90,91 +86,63 @@ class GetCorrection():
 
       def PrepareDataset(self):
 
-          weight = RooRealVar("weight","weight", 0.00001, 100)
-          massZ = RooRealVar("massZ","massZ", 80, 100)
-          massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
-          rastmp = RooArgSet(massZ, massZErr, weight)
-          self.Data_Zlls = RooDataSet("Zlls","Zlls", rastmp)
+          cut = self.cut
+          self.tree.Draw(">>myList", cut, "entrylist")
+          entryList = gDirectory.Get("myList")
+          self.tree.SetEntryList(entryList)
 
-          for i in range(self.tree.GetEntries()):
+          selector = TSelector.GetSelector("MySelector.C+")
 
-#              if i > 1000: continue
+          selector.SetRange_massZ(self.massZ_lo, self.massZ_hi)
+          selector.SetRange_massZErr(self.massZErr_lo, self.massZErr_hi)
+          selector.SetLambda(int(self.doLambda1), self.Lambdas["lambda1"], self.Lambdas["lambda2"])
 
-              self.tree.GetEntry(i)
-              if not (self.tree.massZ > 80 and self.tree.massZ < 100): continue
-              if not (self.tree.massZErr > 0.2 and self.tree.massZErr < 7.2): continue
-              if self.tree.Met > 30: continue
+          self.tree.Process(selector)
 
-              lepInBin = {'lep1InBin1':False, 'lep2InBin1':False, 'lep1InBin2':False, 'lep2InBin2':False}
+          self.Data_Zlls = selector.Data_Zlls
 
-              if self.tree.pT1 > self.pTLow_1st[self.fs] and self.tree.pT1 < self.pTHigh_1st[self.fs] and \
-                 abs(self.tree.eta1) > self.etaLow_1st[self.fs] and abs(self.tree.eta1) < self.etaHigh_1st[self.fs]: 
-                 lepInBin['lep1InBin1'] = True
-              if self.tree.pT2 > self.pTLow_1st[self.fs] and self.tree.pT2 < self.pTHigh_1st[self.fs] and \
-                 abs(self.tree.eta2) > self.etaLow_1st[self.fs] and abs(self.tree.eta2) < self.etaHigh_1st[self.fs]:
-                 lepInBin['lep2InBin1'] = True
-
-              #do lambda1, two leps must in bin1
-              if self.doLambda1 and (not (lepInBin['lep1InBin1'] and lepInBin['lep2InBin1'])): continue
-
-
-              if self.tree.pT1 > self.pTLow and self.tree.pT1 < self.pTHigh and \
-                 abs(self.tree.eta1) > self.etaLow and abs(self.tree.eta1) < self.etaHigh:
-                 lepInBin['lep1InBin2'] = True
-              if self.tree.pT2 > self.pTLow and self.tree.pT2 < self.pTHigh and \
-                 abs(self.tree.eta2) > self.etaLow and abs(self.tree.eta2) < self.etaHigh:
-                 lepInBin['lep2InBin2'] = True
-#              #do lambda1, two leps must in bin1
-#              if self.doLambda1 and (not (lepInBin['lep1InBin1'] and lepInBin['lep2InBin1'])): continue
-              #do lambda2, one lep in bin1, one lep in bin2
-              if (not self.doLambda1) and \
-                 (not ( (lepInBin['lep1InBin1'] and lepInBin['lep2InBin2']) or \
-                        (lepInBin['lep2InBin1'] and lepInBin['lep1InBin2']) )): continue
-
-              tmpMassZErr = self.tree.massZErr
-              if (not self.doLambda1):              
-
-                 tmpMassZErr = self.UpdateMassZErr(self.tree.pT1, self.tree.eta1, self.tree.phi1, self.tree.m1,
-                                         self.tree.pT2, self.tree.eta2, self.tree.phi2, self.tree.m2,
-                                         self.tree.pterr1, self.tree.pterr2, self.Lambdas['lambda1'], self.Lambdas['lambda2'])
-
-              massZ.setVal(self.tree.massZ)
-              massZErr.setVal(tmpMassZErr)
-              weight.setVal(self.tree.weight)
-#              Data_Zlls.add(rastmp)
-              self.Data_Zlls.add(rastmp)
-
-#          print "dataset has " + str(self.Data_Zlls.numEntries()) + " events"
           self.Data_Zlls_w = RooDataSet(self.Data_Zlls.GetName(), self.Data_Zlls.GetTitle(), self.Data_Zlls, self.Data_Zlls.get(), "1", "weight")
           print "dataset has " + str(self.Data_Zlls_w.numEntries()) + " events"
 
-          massZ.setBins(40,"fft")
-          massZErr.setBins(40,"fft")
           self.Data_Zlls_binned = self.Data_Zlls_w.binnedClone()
 
       def MakeModel_getPara(self):
 
           #variables
-          massZ = RooRealVar("massZ","massZ", 80, 100)
-          massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
+          massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
+          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
           #BreitWigner
+<<<<<<< HEAD
+          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", self.GENZ_mean)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", self.GENZ_width)
+=======
           breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#91.14)#187)
           breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.446)#2.406)#2.546)#4952)
+>>>>>>> origin/master
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
           #Crystalball
           mean = RooRealVar("mean","mean", 0, -1, 1)
+<<<<<<< HEAD
+          alpha = RooRealVar("alpha","alpha", 1, 0, 10)
+=======
           alpha = RooRealVar("alpha","alpha", 5, 1, 10)
+>>>>>>> origin/master
           n = RooRealVar("n","n", 5, 0, 30)
           #alpha2 = RooRealVar("alpha2","alpha2", 1.2, 0, 50)
           #n2 = RooRealVar("n2","n2", 15, 0.1, 50)
-          sigma = RooRealVar("sigma", "sigma", 0.1, 0, 10)
+          sigma = RooRealVar("sigma", "sigma", 1, 0, 10)
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
           #GENZ shape convoluted with crystal ball
+<<<<<<< HEAD
+#          rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
+#          rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
+=======
           rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
           rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
+>>>>>>> origin/master
 #          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
           CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
           #bkg
@@ -192,11 +160,16 @@ class GetCorrection():
       def MakeModel_getLambda(self):
 
           #variables
-          massZ = RooRealVar("massZ","massZ", 80, 100)
-          massZErr = RooRealVar("massZErr","massZErr", 0.2, 7.2)
+          massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
+          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
           #BreitWigner
+<<<<<<< HEAD
+          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", self.GENZ_mean)
+          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", self.GENZ_width)
+=======
           breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", 91.2)#87)
           breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", 2.446)#2.406)#4952)
+>>>>>>> origin/master
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
@@ -206,15 +179,26 @@ class GetCorrection():
           n = RooRealVar("n","n", self.shapePara["n"])
           #alpha2 = RooRealVar("alpha2","alpha2", self.shapePara["alpha2"])
           #n2 = RooRealVar("n2","n2", self.shapePara["n2"])
+<<<<<<< HEAD
+          lambda_ = RooRealVar("lambda","lambda", 1, 0.7, 1.3)
+=======
           lambda_ = RooRealVar("lambda","lambda", 0.5, 1.5)
+>>>>>>> origin/master
 #          sigma = RooFormulaVar("sigma","@1*(1+@2/@1*@0)", RooArgList(lambda_, massZ, massZErr))
           sigma = RooFormulaVar("sigma","@1*@0", RooArgList(lambda_,  massZErr))
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
           #GENZ shape convoluted with crystal ball
+<<<<<<< HEAD
+#          rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
+#          rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
+          #CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
+
+=======
           rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
           rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
           #CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
+>>>>>>> origin/master
           CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
 
           tau = RooRealVar("tau","tau", self.shapePara["tau"])
@@ -271,7 +255,7 @@ class GetCorrection():
 
       def PlotFit(self):
 
-          PmassZ = self.w.var("massZ").frame(RooFit.Bins(50))
+          PmassZ = self.w.var("massZ").frame(RooFit.Bins(100))
           PmassZ.GetXaxis().SetTitle("massZ(GeV)")
           PmassZ.GetYaxis().SetTitleOffset(1.3)
 
@@ -362,16 +346,16 @@ class GetCorrection():
       def doLambdaCut(self):
 
           lep1InBin1 = " (pT1 > " + str(self.pTLow_1st[self.fs]) + " && pT1 < " + str(self.pTHigh_1st[self.fs]) + ")"
-          lep1InBin1 += " && (eta1 > " + str(self.etaLow_1st[self.fs]) + " && eta1 < " + str(self.etaHigh_1st[self.fs]) + ")"
+          lep1InBin1 += " && (abs(eta1) > " + str(self.etaLow_1st[self.fs]) + " && abs(eta1) < " + str(self.etaHigh_1st[self.fs]) + ")"
 
           lep2InBin1 = " (pT2 > " + str(self.pTLow_1st[self.fs]) + " && pT2 < " + str(self.pTHigh_1st[self.fs]) + ")"
-          lep2InBin1 += " && (eta2 > " + str(self.etaLow_1st[self.fs]) + " && eta2 < " + str(self.etaHigh_1st[self.fs]) + ")"
+          lep2InBin1 += " && (abs(eta2) > " + str(self.etaLow_1st[self.fs]) + " && abs(eta2) < " + str(self.etaHigh_1st[self.fs]) + ")"
 
           lep1InBin2 = " (pT1 > " + str(self.pTLow) + " && pT1 < " + str(self.pTHigh) + ")"
-          lep1InBin2 += " && (eta1 > " + str(self.etaLow) + " && eta1 < " + str(self.etaHigh) + ")"
+          lep1InBin2 += " && (abs(eta1) > " + str(self.etaLow) + " && abs(eta1) < " + str(self.etaHigh) + ")"
 
           lep2InBin2 = " (pT2 > " + str(self.pTLow) + " && pT2 < " + str(self.pTHigh) + ")"
-          lep2InBin2 += " && (eta2 > " + str(self.etaLow) + " && eta2 < " + str(self.etaHigh) + ")"
+          lep2InBin2 += " && (abs(eta2) > " + str(self.etaLow) + " && abs(eta2) < " + str(self.etaHigh) + ")"
 
           if self.doLambda1:
              self.cut += lep1InBin1 + " && " + lep2InBin1
@@ -386,18 +370,25 @@ class GetCorrection():
          print 'dataset made'
          self.MakeModel_getPara()
          print 'model made'
+
+         self.w.Print()
+
          self.DoFit_getPara()
          print 'fit done'
          self.AfterFit_getPara()
          print 'parameter got'
          self.PlotFit()
          print 'plot made'
-
+ 
+         
       def DriverGetLambda(self):
 
 #         self.MakeSmallTree()
          self.PrepareDataset()
          self.MakeModel_getLambda()
+
+         self.w.Print()
+
          self.DoFit_getLambda()
          self.AfterFit_getLambda()
          self.PlotFit()

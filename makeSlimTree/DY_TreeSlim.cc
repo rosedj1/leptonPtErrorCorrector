@@ -274,8 +274,25 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
 
             TLorentzVector lep1(0,0,0,0);
             TLorentzVector lep2(0,0,0,0);
+
+            eta1 = (*lep_eta)[L1]; eta2 = (*lep_eta)[L2];
+
+            if (abs(idL1) == 13 && abs(idL2) == 13) {
+
+               if (abs(eta1) < 0.9) (*lep_pt)[L1] = (*lep_pt)[L1]/(1-0.00070374);
+               if (abs(eta1) > 0.9 && abs(eta1) < 1.8) (*lep_pt)[L1] = (*lep_pt)[L1]/(1-0.0015881);
+               if (abs(eta1) > 1.8 && abs(eta1) < 2.4) (*lep_pt)[L1] = (*lep_pt)[L1]/(1-0.0029359);
+ 
+               if (abs(eta2) < 0.9) (*lep_pt)[L2] = (*lep_pt)[L2]/(1-0.00070374);
+               if (abs(eta2) > 0.9 && abs(eta2) < 1.8) (*lep_pt)[L2] = (*lep_pt)[L2]/(1-0.0015881);
+               if (abs(eta2) > 1.8 && abs(eta2) < 2.4) (*lep_pt)[L2] = (*lep_pt)[L2]/(1-0.0029359);
+
+               }
+
             phi1 = double((*lep_phi)[L1]); m1 = double((*lep_phi)[L1]);
             phi2 = double((*lep_phi)[L2]); m2 = double((*lep_phi)[L2]);
+            pT1 = (*lep_pt)[L1]; pT2 = (*lep_pt)[L2];
+//            eta1 = (*lep_eta)[L1]; eta2 = (*lep_eta)[L2];
 
             lep1.SetPtEtaPhiM(double((*lep_pt)[L1]),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
             lep2.SetPtEtaPhiM(double((*lep_pt)[L2]),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
@@ -301,10 +318,10 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
             dm2 = (lep1+lep2p).M()-(lep1+lep2).M();
 
             massZErrOld = TMath::Sqrt(dm1*dm1+dm2*dm2);
-
+/*
             pT1 = (*lep_pt)[L1]; pT2 = (*lep_pt)[L2];
             eta1 = (*lep_eta)[L1]; eta2 = (*lep_eta)[L2];
-
+*/
             Met = met; 
 
             genzm=0; GENmass2l=0;

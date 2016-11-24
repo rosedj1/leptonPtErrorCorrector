@@ -9,8 +9,13 @@ time python getLambda1.py --ptLow 5 --ptHigh 100 --etaLow 0 --etaHigh 0.9 --fs m
 #time python getLambda1.py --ptLow 5 --ptHigh 100 --etaLow 0.9 --etaHigh 1.8 --fs mu &
 #time python getLambda1.py --ptLow 5 --ptHigh 100 --etaLow 1.8 --etaHigh 2.4 --fs mu &
 
+<<<<<<< HEAD
+#time python getLambda1.py --ptLow 7 --ptHigh 100 --etaLow 0 --etaHigh 1 --fs e &
+#time python getLambda1.py --ptLow 7 --ptHigh 100 --etaLow 1 --etaHigh 1.44 --fs e &
+=======
 #time python getLambda1.py --ptLow 7 --ptHigh 100 --etaLow 0 --etaHigh 0.8 --fs e &
 #time python getLambda1.py --ptLow 7 --ptHigh 100 --etaLow 0.8 --etaHigh 1.44 --fs e &
+>>>>>>> origin/master
 #time python getLambda1.py --ptLow 7 --ptHigh 100 --etaLow 1.57 --etaHigh 2 --fs e &
 #time python getLambda1.py --ptLow 7 --ptHigh 100 --etaLow 2 --etaHigh 2.5 --fs e &
 
