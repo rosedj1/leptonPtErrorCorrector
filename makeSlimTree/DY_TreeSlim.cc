@@ -109,14 +109,17 @@ using namespace std;
   std::vector<int> *lep_tightId;
 
   std::vector<float>* lep_mass;
-  std::vector<float> *lep_pt; std::vector<float> *lep_eta; std::vector<float> *lep_phi;
+  std::vector<float> *lep_pt;
+  std::vector<float> *lepFSR_pt; 
+  std::vector<float> *lep_eta;
+  std::vector<float> *lep_phi;
   std::vector<int> *lep_genindex;
   std::vector<float> *lep_RelIso;
   std::vector<float> *lep_pterr;
   std::vector<float> *lep_pterrold;
 
-  std::vector<float> *lep_dataMC;
-  std::vector<float>   *GENZ_mass;
+  std::vector<float>  *lep_dataMC;
+  std::vector<float>  *GENZ_mass;
   std::vector<float>  *GENlep_pt;
   std::vector<float>  *GENlep_eta;
   std::vector<float>  *GENlep_phi;
@@ -276,7 +279,7 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
             TLorentzVector lep2(0,0,0,0);
 
             eta1 = (*lep_eta)[L1]; eta2 = (*lep_eta)[L2];
-
+/*
             if (abs(idL1) == 13 && abs(idL2) == 13) {
 
                if (abs(eta1) < 0.9) (*lep_pt)[L1] = (*lep_pt)[L1]/(1-0.00070374);
@@ -288,14 +291,16 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
                if (abs(eta2) > 1.8 && abs(eta2) < 2.4) (*lep_pt)[L2] = (*lep_pt)[L2]/(1-0.0029359);
 
                }
-
+*/
             phi1 = double((*lep_phi)[L1]); m1 = double((*lep_phi)[L1]);
             phi2 = double((*lep_phi)[L2]); m2 = double((*lep_phi)[L2]);
-            pT1 = (*lep_pt)[L1]; pT2 = (*lep_pt)[L2];
-//            eta1 = (*lep_eta)[L1]; eta2 = (*lep_eta)[L2];
+            pT1 = (*lepFSR_pt)[L1]; pT2 = (*lepFSR_pt)[L2];
+//            pT1 = (*lep_pt)[L1]; pT2 = (*lep_pt)[L2];
 
-            lep1.SetPtEtaPhiM(double((*lep_pt)[L1]),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-            lep2.SetPtEtaPhiM(double((*lep_pt)[L2]),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+            lep1.SetPtEtaPhiM(double((*lepFSR_pt)[L1]),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+            lep2.SetPtEtaPhiM(double((*lepFSR_pt)[L2]),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+//            lep1.SetPtEtaPhiM(double((*lep_pt)[L1]),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+//            lep2.SetPtEtaPhiM(double((*lep_pt)[L2]),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
 
             massZ = (lep1+lep2).M();
             pterr1 = double((*lep_pterr)[L1]); pterr2 = double((*lep_pterr)[L2]);
@@ -304,24 +309,25 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
 //            if(massZ<80 || massZ>100) continue;
 
             TLorentzVector lep1p, lep2p;
-            lep1p.SetPtEtaPhiM(double((*lep_pt)[L1]+pterr1),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-            lep2p.SetPtEtaPhiM(double((*lep_pt)[L2]+pterr2),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+//            lep1p.SetPtEtaPhiM(double((*lep_pt)[L1]+pterr1),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+//            lep2p.SetPtEtaPhiM(double((*lep_pt)[L2]+pterr2),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+            lep1p.SetPtEtaPhiM(double((*lepFSR_pt)[L1]+pterr1),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+            lep2p.SetPtEtaPhiM(double((*lepFSR_pt)[L2]+pterr2),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+
             double dm1 = (lep1p+lep2).M()-(lep1+lep2).M();
             double dm2 = (lep1+lep2p).M()-(lep1+lep2).M();
  
             massZErr = TMath::Sqrt(dm1*dm1+dm2*dm2);
 
-            lep1p.SetPtEtaPhiM(double((*lep_pt)[L1]+pterr1old),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-            lep2p.SetPtEtaPhiM(double((*lep_pt)[L2]+pterr2old),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+            lep1p.SetPtEtaPhiM(double((*lepFSR_pt)[L1]+pterr1old),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+            lep2p.SetPtEtaPhiM(double((*lepFSR_pt)[L2]+pterr2old),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+//            lep1p.SetPtEtaPhiM(double((*lep_pt)[L1]+pterr1old),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+//            lep2p.SetPtEtaPhiM(double((*lep_pt)[L2]+pterr2old),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
 
             dm1 = (lep1p+lep2).M()-(lep1+lep2).M();
             dm2 = (lep1+lep2p).M()-(lep1+lep2).M();
 
             massZErrOld = TMath::Sqrt(dm1*dm1+dm2*dm2);
-/*
-            pT1 = (*lep_pt)[L1]; pT2 = (*lep_pt)[L2];
-            eta1 = (*lep_eta)[L1]; eta2 = (*lep_eta)[L2];
-*/
             Met = met; 
 
             genzm=0; GENmass2l=0;
@@ -366,6 +372,7 @@ void setAddresses(TTree* tree){
     tree->SetBranchStatus("lep_id",1);
     tree->SetBranchStatus("lep_tightId",1);
     tree->SetBranchStatus("lep_pt",1);
+    tree->SetBranchStatus("lepFSR_pt",1);
     tree->SetBranchStatus("lep_eta",1);
     tree->SetBranchStatus("lep_phi",1);
     tree->SetBranchStatus("lep_mass",1);
@@ -381,6 +388,7 @@ void setAddresses(TTree* tree){
     tree->SetBranchAddress("lep_tightId", &lep_tightId);
     tree->SetBranchAddress("lep_id", &lep_id);
     tree->SetBranchAddress("lep_pt",&lep_pt);
+    tree->SetBranchAddress("lepFSR_pt",&lepFSR_pt);
     tree->SetBranchAddress("lep_eta",&lep_eta);
     tree->SetBranchAddress("lep_phi",&lep_phi);
     tree->SetBranchAddress("lep_mass",&lep_mass);

@@ -27,8 +27,8 @@ class GetCorrection():
           self.massZErr_lo = 0.2
           self.massZErr_hi = 7.2
 
-          self.GENZ_mean = 91.2
-          self.GENZ_width = 2.446
+          self.GENZ_mean = 91.19
+          self.GENZ_width = 2.44
 
           self.pTLow = binEdge['pTLow']
           self.pTHigh = binEdge['pTHigh']
