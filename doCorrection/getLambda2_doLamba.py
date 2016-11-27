@@ -28,30 +28,29 @@ fs = args.fs
 doLambda1 = False
 lambda1_pre = args.lambda1_pre
 lambdas = {'lambda1':lambda1_pre, 'lambda2':1}
-shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
-#shapePara = {"mean":0, "alpha":0, "n":0, "alpha2":0, "n2":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
+shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
 
-path = "/home/mhl/public_html/2016/20161122_mass/getLambda2_e/"
+path = {}
+#path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"
+path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/"
+path['output'] = "/home/mhl/public_html/2016/20161125_mass/test/"
 
-tag = "doLambda2_getPara_" + fs
+tag = "doLambda2_getLambda_" + fs + "_v" + str(it)
 
-#get CB para
-getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
+getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
+tmpPara_ =  __import__(getCorr_getLambda.name.replace('getLambda', 'getPara').replace('.','p'), globals(), locals())
 
-getCorr_getPara.DriverGetPara()
+getCorr_getLambda.shapePara = tmpPara_.shapePara
+getCorr_getLambda.DriverGetLambda()
 
-#sys.exit()
 
-if args.doDEBUG_para:
-   sys.exit()
 
-shapePara = getCorr_getPara.shapePara
+
 
 needMoreCorr = True
 it = 0
 savedLambda = []
 
-tag = "doLambda2_getLambda_" + fs + "_v" + str(it)
 getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
 getCorr_getLambda.DriverGetLambda()
 tmpLambdas = {'it':it, 'lambda': getCorr_getLambda.Lambdas['lambda'],\

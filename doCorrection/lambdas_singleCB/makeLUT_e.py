@@ -49,9 +49,10 @@ for i in range(len(binx)-1):
         etaLow = str(round(Biny[j],1))
         etaHigh = str(round(Biny[j+1],1))
  
-        if float(etaLow) >= 1.5:
-           pTLow = str(round(10.0, 1))
-           pTHigh = str(round(100.0, 1))
+
+#        if float(etaLow) >= 1.5:
+#           pTLow = str(round(10.0, 1))
+#           pTHigh = str(round(100.0, 1))
 
 #        txtName = "DY_Pt_" + pTLow + "_to_" + pTHigh + "_Eta_" + etaLow + "_to_" + etaHigh + "_" + fs
         if args.isData:
@@ -62,10 +63,10 @@ for i in range(len(binx)-1):
 #        print i,j, txtName, getLambda2(txtName)
 #        LUT.SetBinContent(i+1,j+1,getLambda2(txtName))
 
-LUT.SetBinContent(1,1,1.171)
-LUT.SetBinContent(1,2,1.139)
-LUT.SetBinContent(1,3,1.117)
-LUT.SetBinContent(1,4,1.078)
+LUT.SetBinContent(1,1,1.245)
+LUT.SetBinContent(1,2,1.140)
+LUT.SetBinContent(1,3,1.070)
+LUT.SetBinContent(1,4,1.178)
 
 c1 = TCanvas("c1","",800,800)
 

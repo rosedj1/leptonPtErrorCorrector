@@ -11,6 +11,8 @@ class GetCorrection():
 
       def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
 
+          self.selectors = {}
+
           if not doLambda1:
              self.pTLow_1st = {'e': 7, 'mu': 40}
              self.pTHigh_1st = {'e': 100, 'mu': 50}
@@ -43,6 +45,7 @@ class GetCorrection():
           self.doLambda1 = doLambda1
           #cut to make dataset
           self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
+#          self.cut = " (massZ > 60 && massZ < 120) && "
           self.cut += " (massZErr > "+str(self.massZErr_lo)+" && massZErr < "+str(self.massZErr_hi)+") && "
 
           self.doLambdaCut() # doLambda1Cut or doLambda2Cut
@@ -87,7 +90,7 @@ class GetCorrection():
           entryList = gDirectory.Get("myList")
           self.tree.SetEntryList(entryList)
 
-          selector = TSelector.GetSelector("MySelector.C+")
+          selector = TSelector.GetSelector("MySelector.C")
 
           selector.SetRange_massZ(self.massZ_lo, self.massZ_hi)
           selector.SetRange_massZErr(self.massZErr_lo, self.massZErr_hi)
@@ -168,9 +171,9 @@ class GetCorrection():
           CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
 
           tau = RooRealVar("tau","tau", self.shapePara["tau"])
-          pa1 = RooRealVar("pa1","pa1", self.shapePara["pa1"])
-          pa2 = RooRealVar("pa2","pa2", self.shapePara["pa2"])
-          p2 = RooFormulaVar("p2", "@1*@0+@2*@0*@0",RooArgList(massZ,pa1,pa2))
+#          pa1 = RooRealVar("pa1","pa1", self.shapePara["pa1"])
+#          pa2 = RooRealVar("pa2","pa2", self.shapePara["pa2"])
+#          p2 = RooFormulaVar("p2", "@1*@0+@2*@0*@0",RooArgList(massZ,pa1,pa2))
 #          bkg = RooExponential("bkg","bkg", p2, tau)
           bkg = RooExponential("bkg","bkg", massZ, tau)
 
