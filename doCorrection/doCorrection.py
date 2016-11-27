@@ -60,4 +60,5 @@ else:
    tmpPara_ =  __import__(getCorr_getLambda.name.replace('getLambda', 'getPara').replace('.','p'), globals(), locals())
    getCorr_getLambda.shapePara = tmpPara_.shapePara
    getCorr_getLambda.DriverGetLambda()
- 
+   with open('lambdas_singleCB/'+getCorr_getLambda.name+'.txt', 'a')  as f:
+        f.write(str(getCorr_getLambda.Lambdas)+'\n')

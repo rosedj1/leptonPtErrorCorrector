@@ -4,6 +4,7 @@ from array import array
 from math import *
 from tdrStyle import *
 from subprocess import call
+RooMsgService.instance().setStreamStatus(1,False);
 
 setTDRStyle()
 
@@ -278,7 +279,6 @@ class GetCorrection():
 
 
           for i in range(self.tree.GetEntries()): 
-              print "hh"
               self.tree.GetEntry(i)
               massZ[0] = self.tree.massZ
               weight[0] = self.tree.weight
@@ -340,7 +340,7 @@ class GetCorrection():
          self.MakeModel_getPara()
          print 'model made'
 
-         self.w.Print()
+#         self.w.Print()
 
          self.DoFit_getPara()
          print 'fit done'
@@ -356,7 +356,7 @@ class GetCorrection():
          self.PrepareDataset()
          self.MakeModel_getLambda()
 
-         self.w.Print()
+#         self.w.Print()
 
          self.DoFit_getLambda()
          self.AfterFit_getLambda()
