@@ -5,7 +5,6 @@ from math import *
 from tdrStyle import *
 from subprocess import call
 RooMsgService.instance().setStreamStatus(1,False);
-
 setTDRStyle()
 
 class GetCorrection():
@@ -22,16 +21,16 @@ class GetCorrection():
 #          else:
           self.doLambda1 = doLambda1[0]
 
-          self.pTLow_1st = {binEdge['pTLow']}
-          self.pTHigh_1st = {binEdge['pTHigh']}
-          self.etaLow_1st = {binEdge['etaLow']}
-          self.etaHigh_1st = {binEdge['etaHigh']}
+          self.pTLow_1st = binEdge['pTLow']
+          self.pTHigh_1st = binEdge['pTHigh']
+          self.etaLow_1st = binEdge['etaLow']
+          self.etaHigh_1st = binEdge['etaHigh']
 
           if not self.doLambda1:
-             self.pTLow_1st = {doLambda1[1]['pTLow']}
-             self.pTHigh_1st = {doLambda1[1]['pTHigh']}
-             self.etaLow_1st = {doLambda1[1]['etaLow']}
-             self.etaHigh_1st = {doLambda1[1]['etaHigh']}
+             self.pTLow_1st = doLambda1[1]['pTLow']
+             self.pTHigh_1st = doLambda1[1]['pTHigh']
+             self.etaLow_1st = doLambda1[1]['etaLow']
+             self.etaHigh_1st = doLambda1[1]['etaHigh']
              
           self.massZ_lo = 60
           self.massZ_hi = 120
@@ -154,6 +153,7 @@ class GetCorrection():
           #variables
           massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
           massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
+#          massZ.setBins(10000,"cahe")
           #BreitWigner
           breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", self.GENZ_mean)
           breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", self.GENZ_width)
@@ -166,7 +166,7 @@ class GetCorrection():
           n = RooRealVar("n","n", self.shapePara["n"])
           #alpha2 = RooRealVar("alpha2","alpha2", self.shapePara["alpha2"])
           #n2 = RooRealVar("n2","n2", self.shapePara["n2"])
-          lambda_ = RooRealVar("lambda","lambda", 1, 0.7, 1.3)
+          lambda_ = RooRealVar("lambda","lambda", 1, 0.5, 1.5)
 #          sigma = RooFormulaVar("sigma","@1*(1+@2/@1*@0)", RooArgList(lambda_, massZ, massZErr))
           sigma = RooFormulaVar("sigma","@1*@0", RooArgList(lambda_,  massZErr))
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
@@ -203,10 +203,10 @@ class GetCorrection():
 
           if self.Data_Zlls_w.numEntries() < 5000:
              self.rFit = self.w.pdf("model").fitTo( self.Data_Zlls_w, RooFit.ConditionalObservables( RooArgSet(self.w.var("massZErr")) ),\
-                                                    RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE), RooFit.PrintLevel(-1), RooFit.Timer(kTRUE) )
+                                                    RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE), RooFit.PrintLevel(-9999), RooFit.Timer(kTRUE) )
           else:
              self.rFit = self.w.pdf("model").fitTo( self.Data_Zlls_binned, RooFit.ConditionalObservables( RooArgSet(self.w.var("massZErr")) ),\
-                                                    RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE), RooFit.PrintLevel(-1), RooFit.Timer(kTRUE) )
+                                                    RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE), RooFit.PrintLevel(-9999), RooFit.Timer(kTRUE) )
 
       def AfterFit_getPara(self):
 
@@ -321,11 +321,11 @@ class GetCorrection():
         
       def doLambdaCut(self):
 
-          lep1InBin1 = " (pT1 > " + str(self.pTLow_1st[self.fs]) + " && pT1 < " + str(self.pTHigh_1st[self.fs]) + ")"
-          lep1InBin1 += " && (abs(eta1) > " + str(self.etaLow_1st[self.fs]) + " && abs(eta1) < " + str(self.etaHigh_1st[self.fs]) + ")"
+          lep1InBin1 = " (pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+          lep1InBin1 += " && (abs(eta1) > " + str(self.etaLow_1st) + " && abs(eta1) < " + str(self.etaHigh_1st) + ")"
 
-          lep2InBin1 = " (pT2 > " + str(self.pTLow_1st[self.fs]) + " && pT2 < " + str(self.pTHigh_1st[self.fs]) + ")"
-          lep2InBin1 += " && (abs(eta2) > " + str(self.etaLow_1st[self.fs]) + " && abs(eta2) < " + str(self.etaHigh_1st[self.fs]) + ")"
+          lep2InBin1 = " (pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+          lep2InBin1 += " && (abs(eta2) > " + str(self.etaLow_1st) + " && abs(eta2) < " + str(self.etaHigh_1st) + ")"
 
           lep1InBin2 = " (pT1 > " + str(self.pTLow) + " && pT1 < " + str(self.pTHigh) + ")"
           lep1InBin2 += " && (abs(eta1) > " + str(self.etaLow) + " && abs(eta1) < " + str(self.etaHigh) + ")"

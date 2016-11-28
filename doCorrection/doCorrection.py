@@ -15,8 +15,8 @@ def ParseOption():
     parser.add_argument('--lambdas',dest='lambdas', nargs='+', help='', type=float)#, required=True)
     parser.add_argument('--inpath', dest='inpath', type=str)
     parser.add_argument('--outpath', dest='outpath', type=str)
-    parser.add_argument('--ptLow_lambda1', dest='ptLow_lambda1', type=float)
-    parser.add_argument('--ptHigh_lambda1', dest='ptHigh_lambda1', type=float)
+    parser.add_argument('--ptLow_lambda1', dest='pTLow_lambda1', type=float)
+    parser.add_argument('--ptHigh_lambda1', dest='pTHigh_lambda1', type=float)
     parser.add_argument('--etaLow_lambda1', dest='etaLow_lambda1', type=float)
     parser.add_argument('--etaHigh_lambda1', dest='etaHigh_lambda1', type=float)
     
@@ -33,8 +33,8 @@ etaHigh = args.etaHigh
 binEdge = {'pTLow': pTLow, 'pTHigh':pTHigh, 'etaLow':etaLow, 'etaHigh':etaHigh}
 isData = args.isData
 fs = args.fs
-doLambda1[0] = args.doLambda1
-doLambda1[1] = {'pTLow': args.pTLow_lambda1, 'pTHigh':args.pTHigh_lambda1, 'etaLow':args.etaLow_lambda1, 'etaHigh':args.etaHigh_lambda1}
+doLambda1 = [args.doLambda1]
+doLambda1.append( {'pTLow': args.pTLow_lambda1, 'pTHigh':args.pTHigh_lambda1, 'etaLow':args.etaLow_lambda1, 'etaHigh':args.etaHigh_lambda1} )
 doPara = args.doPara
 lambdas = {'lambda1':args.lambdas[0], 'lambda2':args.lambdas[1]}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
@@ -66,7 +66,7 @@ else:
    getCorr_getLambda.shapePara = tmpPara_.shapePara
    getCorr_getLambda.DriverGetLambda()
    lambdaFileName = 'pT_' + str(binEdge['pTLow']) + '_' + str(binEdge['pTHigh']) + '_eta_' + str(binEdge['etaLow']) + '_' + str(binEdge['etaHigh'])
-   lambdaFileName.replace('.','p')
+   lambdaFileName = lambdaFileName.replace('.','p')
    if isData:
       lambdaFileName += '_'+fs+'_data.py'
    else: 
