@@ -15,6 +15,10 @@ def ParseOption():
     parser.add_argument('--lambdas',dest='lambdas', nargs='+', help='', type=float)#, required=True)
     parser.add_argument('--inpath', dest='inpath', type=str)
     parser.add_argument('--outpath', dest='outpath', type=str)
+    parser.add_argument('--ptLow_lambda1', dest='ptLow_lambda1', type=float)
+    parser.add_argument('--ptHigh_lambda1', dest='ptHigh_lambda1', type=float)
+    parser.add_argument('--etaLow_lambda1', dest='etaLow_lambda1', type=float)
+    parser.add_argument('--etaHigh_lambda1', dest='etaHigh_lambda1', type=float)
     
     args = parser.parse_args()
     return args
@@ -29,7 +33,8 @@ etaHigh = args.etaHigh
 binEdge = {'pTLow': pTLow, 'pTHigh':pTHigh, 'etaLow':etaLow, 'etaHigh':etaHigh}
 isData = args.isData
 fs = args.fs
-doLambda1 = args.doLambda1
+doLambda1[0] = args.doLambda1
+doLambda1[1] = {'pTLow': args.pTLow_lambda1, 'pTHigh':args.pTHigh_lambda1, 'etaLow':args.etaLow_lambda1, 'etaHigh':args.etaHigh_lambda1}
 doPara = args.doPara
 lambdas = {'lambda1':args.lambdas[0], 'lambda2':args.lambdas[1]}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
@@ -39,7 +44,7 @@ path['input'] = args.inpath #"/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoo
 path['output'] = args.outpath #"/home/mhl/public_html/2016/20161125_mass/test/" #getLambda1/"
 
 tag = 'do'
-if doLambda1:
+if doLambda1[0]:
    tag += 'Lambda1_'
 else:
    tag += 'Lambda2_'
@@ -60,5 +65,11 @@ else:
    tmpPara_ =  __import__(getCorr_getLambda.name.replace('getLambda', 'getPara').replace('.','p'), globals(), locals())
    getCorr_getLambda.shapePara = tmpPara_.shapePara
    getCorr_getLambda.DriverGetLambda()
-   with open('lambdas_singleCB/'+getCorr_getLambda.name+'.txt', 'a')  as f:
-        f.write(str(getCorr_getLambda.Lambdas)+'\n')
+   lambdaFileName = 'pT_' + str(binEdge['pTLow']) + '_' + str(binEdge['pTHigh']) + '_eta_' + str(binEdge['etaLow']) + '_' + str(binEdge['etaHigh'])
+   lambdaFileName.replace('.','p')
+   if isData:
+      lambdaFileName += '_'+fs+'_data.py'
+   else: 
+      lambdaFileName += '_'+fs+'_mc.py'
+   with open('lambdas_singleCB/'+lambdaFileName, 'w')  as f:
+        f.write('lambdas = ' + str(getCorr_getLambda.Lambdas)+'\n')

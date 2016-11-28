@@ -14,17 +14,25 @@ class GetCorrection():
 
           self.selectors = {}
 
-          if not doLambda1:
-             self.pTLow_1st = {'e': 7, 'mu': 40}
-             self.pTHigh_1st = {'e': 100, 'mu': 50}
-             self.etaLow_1st = {'e': 0, 'mu': 0}
-             self.etaHigh_1st = {'e': 1, 'mu': 0.9}
-          else:
-             self.pTLow_1st = {'e': binEdge['pTLow'], 'mu': binEdge['pTLow']}
-             self.pTHigh_1st = {'e': binEdge['pTHigh'], 'mu': binEdge['pTHigh']}
-             self.etaLow_1st = {'e': binEdge['etaLow'], 'mu': binEdge['etaLow']}
-             self.etaHigh_1st = {'e': binEdge['etaHigh'], 'mu': binEdge['etaHigh']}
+#          if not doLambda1:
+#             self.pTLow_1st = {'e': 7, 'mu': 40}
+#             self.pTHigh_1st = {'e': 100, 'mu': 50}
+#             self.etaLow_1st = {'e': 0, 'mu': 0}
+#             self.etaHigh_1st = {'e': 1, 'mu': 0.9}
+#          else:
+          self.doLambda1 = doLambda1[0]
 
+          self.pTLow_1st = {binEdge['pTLow']}
+          self.pTHigh_1st = {binEdge['pTHigh']}
+          self.etaLow_1st = {binEdge['etaLow']}
+          self.etaHigh_1st = {binEdge['etaHigh']}
+
+          if not self.doLambda1:
+             self.pTLow_1st = {doLambda1[1]['pTLow']}
+             self.pTHigh_1st = {doLambda1[1]['pTHigh']}
+             self.etaLow_1st = {doLambda1[1]['etaLow']}
+             self.etaHigh_1st = {doLambda1[1]['etaHigh']}
+             
           self.massZ_lo = 60
           self.massZ_hi = 120
           self.massZErr_lo = 0.2
@@ -43,7 +51,6 @@ class GetCorrection():
                           'lambda': 1}
 
           self.fs = fs
-          self.doLambda1 = doLambda1
           #cut to make dataset
           self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
 #          self.cut = " (massZ > 60 && massZ < 120) && "
