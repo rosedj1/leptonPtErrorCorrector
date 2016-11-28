@@ -63,7 +63,8 @@ public :
    RooRealVar* rv_massZErr; 
    RooArgSet*  rastmp; 
    RooDataSet* Data_Zlls;    
-
+//   TH2F* massZ_massZErr;
+   
    int doLambda1;
    double lambda1;
    double lambda2;

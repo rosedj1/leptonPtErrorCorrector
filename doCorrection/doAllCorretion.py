@@ -13,7 +13,10 @@ def GetLambda(isData, pTRange, etaRange, fs, iteration):
     if isData:
        lambdaFileName += '_'+fs+'_data'
     else:
-       lambdaFileName += '_'+fs+'_mc'
+       lambdaFileName += '_'+fs+'_mc' 
+
+    if iteration >= 0:
+       lambdaFileName += '_v' +str(iteration) 
 
     tmpLambda =  __import__(lambdaFileName, globals(), locals())
     lambdas = tmpLambda.lambdas
@@ -47,7 +50,7 @@ def doLambda1(pTRange, etaRange, inpath, outpath, fs, isData):
 
     call(cmd, shell=True)
 
-    lambdas = GetLambda(isData, pTRange, etaRange, fs, 0)
+    lambdas = GetLambda(isData, pTRange, etaRange, fs, -1)
 
     return lambdas
 
@@ -56,16 +59,17 @@ def doLambda1(pTRange, etaRange, inpath, outpath, fs, isData):
 
 def doLambda2(pTRange, etaRange, inpath, outpath, fs, isData, lambda1Info, iterationMax):
 
+
     lambda1_pt = lambda1Info[0]
     lambda1_eta = lambda1Info[1]
-    lambda1 = lambdaInfo[2]
+    lambda1 = lambda1Info[2]
 
     cmd = ' python doCorrection.py \
             --ptLow ' + str(pTRange[0]) + ' --ptHigh ' + str(pTRange[1]) \
         + ' --etaLow '  + str(etaRange[0]) + ' --etaHigh ' + str(etaRange[1]) \
         + ' --ptLow_lambda1 ' + str(lambda1_pt[0]) + ' --ptHigh_lambda1 ' + str(lambda1_pt[1]) \
         + ' --etaLow_lambda1 '  + str(lambda1_eta[0]) + ' --etaHigh_lambda1 ' + str(lambda1_eta[1]) \
-        + ' --fs ' + fs + ' --doPara --lambdas ' + str(lambda1) + ' 1 ' \
+        + ' --fs ' + fs + ' --doPara --lambdas ' + str(lambda1) + ' 1 --iteration 0' \
         + ' --inpath ' + inpath + ' --outpath ' + outpath + ';'
 
     cmd+= ' python doCorrection.py \
@@ -73,16 +77,20 @@ def doLambda2(pTRange, etaRange, inpath, outpath, fs, isData, lambda1Info, itera
         + ' --etaLow '  + str(etaRange[0]) + ' --etaHigh ' + str(etaRange[1]) \
         + ' --ptLow_lambda1 ' + str(lambda1_pt[0]) + ' --ptHigh_lambda1 ' + str(lambda1_pt[1]) \
         + ' --etaLow_lambda1 '  + str(lambda1_eta[0]) + ' --etaHigh_lambda1 ' + str(lambda1_eta[1]) \
-        + ' --fs ' + fs + ' --lambdas ' + str(lambda1) + ' 1 ' \
+        + ' --fs ' + fs + ' --lambdas ' + str(lambda1) + ' 1 --iteration 0' \
         + ' --inpath ' + inpath + ' --outpath ' + outpath
+
+    call(cmd, shell=True)
 
     needMoreCorrection = True
     iteration = 0
-    lambdas = GetLambda(isData, pTRange, etaRange, fs, iteration)
+
+    lambdas_tagged = GetLambda(isData, pTRange, etaRange, fs, iteration)
+    lambdas = lambdas_tagged[1]
     lambdas['lambda2'] *= lambdas['lambda']
 
-    if (lambdas['lambda2'] - 1) < 0.1:
-       return lambdas
+    if (lambdas['lambda'] - 1) < 0.01:
+       return lambdas_tagged
 
     while (needMoreCorrection):
 
@@ -94,20 +102,21 @@ def doLambda2(pTRange, etaRange, inpath, outpath, fs, isData, lambda1Info, itera
               + ' --etaLow '  + str(etaRange[0]) + ' --etaHigh ' + str(etaRange[1]) \
               + ' --ptLow_lambda1 ' + str(lambda1_pt[0]) + ' --ptHigh_lambda1 ' + str(lambda1_pt[1]) \
               + ' --etaLow_lambda1 '  + str(lambda1_eta[0]) + ' --etaHigh_lambda1 ' + str(lambda1_eta[1]) \
-              + ' --fs ' + fs + ' --lambdas ' + str(lambda1) + ' ' + str(lambda2) \
+              + ' --fs ' + fs + ' --lambdas ' + str(lambda1) + ' ' + str(lambda2) + ' --iteration ' + str(iteration)\
               + ' --inpath ' + inpath + ' --outpath ' + outpath 
 
           call(cmd, shell=True)          
-          lambdas = GetLambda(isData, pTRange, etaRange, fs, iteration)
+          lambdas_tagged = GetLambda(isData, pTRange, etaRange, fs, iteration)
+          lambdas = lambdas_tagged[1]
           lambdas['lambda2'] *= lambdas['lambda']
 
-          if (lambdas['lambda'] - 1) < 0.1 or iteration == iterationMax:
+          if (lambdas['lambda'] - 1) < 0.01 or iteration == iterationMax:
              needMoreCorrection = False
 
-    return lambdas
+    return lambdas_tagged
 
 
-def MakeLUT(pTs, etas, allLambdas, isData, fs, outpath):
+def MakeLUT(pTs, etas, allLambdas, isData, fs, outpath, doLambda1):
     #make LUT of corrections
     binPt, binEta = array('f'), array('f')
     for i in range(len(pTs)): binPt.append(pTs[i])
@@ -119,7 +128,10 @@ def MakeLUT(pTs, etas, allLambdas, isData, fs, outpath):
             tag = 'pT_' + str(float(pTs[i])) + '_' + str(float(pTs[i+1])) + '_eta_' + str(float(etas[j])) + '_' + str(float(etas[j+1]))
             for k in range(len(allLambdas)):
                 if allLambdas[k][0] == tag:
-                   LUT.SetBinContent(i+1,j+1, allLambdas[k][1]['lambda'])
+                   if doLambda1:
+                      LUT.SetBinContent(i+1,j+1, allLambdas[k][1]['lambda'])
+                   else:
+                      LUT.SetBinContent(i+1,j+1, allLambdas[k][1]['lambda2'])
 
     if isData:
        file1 = "DoubleLepton_m2"+fs+"LUT_m2"+fs+".root"
@@ -153,7 +165,7 @@ def doMuon(muonPt, muonEta, inpath, outpath, isData):
         allLambdas.append(lambdas)
         print lambdas
 
-    MakeLUT(muonPt, muonEta, allLambdas, isData, 'mu', outpath)
+    MakeLUT(muonPt, muonEta, allLambdas, isData, 'mu', outpath, True)
 
 def doElectron(electronPt, electronEta, inpath, outpath, isData):
 
@@ -176,7 +188,7 @@ def doElectron(electronPt, electronEta, inpath, outpath, isData):
         allLambdas.append(lambdas)
         print lambdas
 
-    MakeLUT(electronPt, electronEta, allLambdas, isData, 'e', outpath)
+    MakeLUT(electronPt, electronEta, allLambdas, isData, 'e', outpath, False)
 
 
 

@@ -83,18 +83,18 @@ class GetCorrection():
           self.w = RooWorkspace("w","workspace")
 
           #dataset
-          self.Data_Zlls = RooDataSet()
-          self.Data_Zlls_w = RooDataSet()
+          self.Data_Zlls = RooDataHist()#RooDataSet()
+          self.Data_Zlls_w = RoDataHist()#RooDataSet()
           self.Data_Zlls_binned = RooDataHist()
-#          self.DataHist = TH2F()
+          self.DataHist = TH2F()
  
           self.rFit = RooFitResult() 
 
 
       def PrepareDataset(self):
 
-#          massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
-#          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
+          massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
+          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
 
           cut = self.cut
           self.tree.Draw(">>myList", cut, "entrylist")
@@ -109,10 +109,12 @@ class GetCorrection():
 
           self.tree.Process(selector)
 
-          self.Data_Zlls = selector.Data_Zlls
-          self.Data_Zlls_w = RooDataSet(self.Data_Zlls.GetName(), self.Data_Zlls.GetTitle(), self.Data_Zlls, self.Data_Zlls.get(), "1", "weight")
-          print "dataset has " + str(self.Data_Zlls_w.numEntries()) + " events"
-          self.Data_Zlls_binned = self.Data_Zlls_w.binnedClone()
+#          self.Data_Zlls = selector.Data_Zlls
+#          self.Data_Zlls_w = RooDataSet(self.Data_Zlls.GetName(), self.Data_Zlls.GetTitle(), self.Data_Zlls, self.Data_Zlls.get(), "1", "weight")
+#          print "dataset has " + str(self.Data_Zlls_w.numEntries()) + " events"
+#          self.Data_Zlls_binned = self.Data_Zlls_w.binnedClone()
+          self.DataHist = selector.massZ_massZErr
+          self.Data_Zlls = RooDataHist('Data_Zlls', 'Data_Zlls', RooArgList(massZ,massZErr), self.DataHist, 1)
 
       def MakeModel_getPara(self):
 
