@@ -148,6 +148,26 @@ def MakeLUT(pTs, etas, allLambdas, isData, fs, outpath, doLambda1):
     LUT.Write()
     f1.Close()
 
+
+def doLambda1s(pt, eta, inpath, outpath, isData, fs):
+    pool = multiprocessing.Pool( len(eta) -1 )
+    tasks = []
+
+    #split jobs into different process
+    for i in range(len(eta)-1):
+        tasks.append( (pt, [eta[i],eta[i+1]], inpath, outpath, fs, isData) )
+
+    results = [pool.apply_async( doLambda1, t ) for t in tasks]
+
+    allLambdas = []
+    for result in results:
+        (lambdas) = result.get()
+        allLambdas.append(lambdas)
+        print lambdas
+
+    MakeLUT(pt, eta, allLambdas, isData, fs, outpath, True)
+
+
 def doMuon(muonPt, muonEta, inpath, outpath, isData):
 
     pool = multiprocessing.Pool( len(muonEta) -1 )
@@ -167,9 +187,9 @@ def doMuon(muonPt, muonEta, inpath, outpath, isData):
 
     MakeLUT(muonPt, muonEta, allLambdas, isData, 'mu', outpath, True)
 
-def doElectron(electronPt, electronEta, inpath, outpath, isData):
+def doElectron(electronPt, electronEta, inpath, outpath, isData, firstBin):
 
-    lambda1 = doLambda1([7,100], [0,0.8], inpath, outpath, 'e', isData)
+    lambda1 = doLambda1([firstBin[0],firstBin[1]], [firstBin[2],firstBin[3]], inpath, outpath, 'e', isData)
 
     pool = multiprocessing.Pool( (len(electronEta) -1)*(len(electronPt) - 1) )
     tasks = []
@@ -178,7 +198,7 @@ def doElectron(electronPt, electronEta, inpath, outpath, isData):
     for i in range(len(electronPt)-1):
         for j in range(len(electronEta)-1):
             tasks.append( ([electronPt[i], electronPt[i+1]], [electronEta[j], electronEta[j+1]], inpath, outpath, 'e', isData, \
-                           [[7,100],[0,0.8],lambda1[1]['lambda']], 5) )
+                           [[firstBin[0],firstBin[1]], [firstBin[2],firstBin[3]],lambda1[1]['lambda']], 5) )
 
     results = [pool.apply_async( doLambda2, t ) for t in tasks]
 
@@ -198,9 +218,12 @@ outpath = '/home/mhl/public_html/2016/20161125_mass/test/'
 muonPt = [5,100]
 muonEta = [0, 0.9, 1.8, 2.4]
 
+#electronPt = [7,30,60,100]
 electronPt = [7,100]
-electronEta = [0,0.8,1.5,2,2.5]
+electronEta = [0,0.7,1,1.2,1.44,1.57,2,2.5]
 
 #doMuon(muonPt, muonEta, inpath, outpath, False)
-doElectron(electronPt, electronEta, inpath, outpath, False)
-### define lambda1 binning in doElectron
+#doElectron(electronPt, electronEta, inpath, outpath, False, [7,100,0,0.8])
+doLambda1s(electronPt, electronEta, inpath, outpath, False, 'e')
+
+call('cp lambdas_singleCB/DYJetsToLL_M-50_m2eLUT_m2e.root /raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_HZZ4L/packages/doClosure/ZClosure/LUT_2e.root',shell=True)
