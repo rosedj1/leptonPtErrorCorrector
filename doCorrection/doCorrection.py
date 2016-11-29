@@ -15,7 +15,12 @@ def ParseOption():
     parser.add_argument('--lambdas',dest='lambdas', nargs='+', help='', type=float)#, required=True)
     parser.add_argument('--inpath', dest='inpath', type=str)
     parser.add_argument('--outpath', dest='outpath', type=str)
-    
+    parser.add_argument('--ptLow_lambda1', dest='pTLow_lambda1', type=float)
+    parser.add_argument('--ptHigh_lambda1', dest='pTHigh_lambda1', type=float)
+    parser.add_argument('--etaLow_lambda1', dest='etaLow_lambda1', type=float)
+    parser.add_argument('--etaHigh_lambda1', dest='etaHigh_lambda1', type=float)
+    parser.add_argument('--iteration', dest='iteration', type=str, default='')
+       
     args = parser.parse_args()
     return args
 
@@ -29,17 +34,19 @@ etaHigh = args.etaHigh
 binEdge = {'pTLow': pTLow, 'pTHigh':pTHigh, 'etaLow':etaLow, 'etaHigh':etaHigh}
 isData = args.isData
 fs = args.fs
-doLambda1 = args.doLambda1
+doLambda1 = [args.doLambda1]
+doLambda1.append( {'pTLow': args.pTLow_lambda1, 'pTHigh':args.pTHigh_lambda1, 'etaLow':args.etaLow_lambda1, 'etaHigh':args.etaHigh_lambda1} )
 doPara = args.doPara
 lambdas = {'lambda1':args.lambdas[0], 'lambda2':args.lambdas[1]}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
+iteration = args.iteration
 
 path = {}
 path['input'] = args.inpath #"/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/"
 path['output'] = args.outpath #"/home/mhl/public_html/2016/20161125_mass/test/" #getLambda1/"
 
 tag = 'do'
-if doLambda1:
+if doLambda1[0]:
    tag += 'Lambda1_'
 else:
    tag += 'Lambda2_'
@@ -50,15 +57,38 @@ if doPara:
    getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
    getCorr_getPara.DriverGetPara()
    shapePara = getCorr_getPara.shapePara
-   with open('shapeParameters/' + getCorr_getPara.name.replace('.','p') + '.py', 'w') as f:
+   shapeFileName = getCorr_getPara.name.replace('.','p')
+   if len(iteration) > 0:
+      shapeFileName += '_v0.py'
+   else:
+      shapeFileName += '.py'
+   with open('shapeParameters/' + shapeFileName, 'w') as f:
         f.write('shapePara = ' + str(shapePara) + ' \n')
 
 else:
 
    tag += 'getLambda_' + fs
+   if len(iteration) > 0:
+      tag += '_v' + iteration
    getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
-   tmpPara_ =  __import__(getCorr_getLambda.name.replace('getLambda', 'getPara').replace('.','p'), globals(), locals())
+  
+   shapeFileName = getCorr_getLambda.name.replace('getLambda', 'getPara').replace('.','p')
+   shapeFileName = shapeFileName.replace(fs+'_v'+iteration, fs+'_v0')
+   tmpPara_ =  __import__(shapeFileName, globals(), locals())
    getCorr_getLambda.shapePara = tmpPara_.shapePara
+
    getCorr_getLambda.DriverGetLambda()
-   with open('lambdas_singleCB/'+getCorr_getLambda.name+'.txt', 'a')  as f:
-        f.write(str(getCorr_getLambda.Lambdas)+'\n')
+
+   lambdaFileName = 'pT_' + str(binEdge['pTLow']) + '_' + str(binEdge['pTHigh']) + '_eta_' + str(binEdge['etaLow']) + '_' + str(binEdge['etaHigh'])
+   lambdaFileName = lambdaFileName.replace('.','p')
+   if isData:
+      lambdaFileName += '_'+fs+'_data'
+   else: 
+      lambdaFileName += '_'+fs+'_mc'
+   if len(iteration) > 0:
+      lambdaFileName += '_v' + iteration + '.py'
+   else:
+      lambdaFileName += '.py'
+
+   with open('lambdas_singleCB/'+lambdaFileName, 'w')  as f:
+        f.write('lambdas = ' + str(getCorr_getLambda.Lambdas)+'\n')

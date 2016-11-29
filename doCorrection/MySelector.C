@@ -52,8 +52,13 @@ void MySelector::Begin(TTree * /*tree*/)
    rastmp = new RooArgSet(*rv_massZ, *rv_massZErr, *rv_weight);
    Data_Zlls = new RooDataSet("Zlls","Zlls", *rastmp);
 
-   rv_massZ->setBins(50,"fft");
-   rv_massZErr->setBins(50,"fft");
+//   massZ_massZErr = new TH2F("massZ_massZErr", "", 300, massZ_lo, massZ_hi, 100, massZErr_lo, massZErr_hi);
+
+//   rv_massZ->setBins(300,"fft");
+//   rv_massZErr->setBins(50,"fft");
+
+    rv_massZ->setBins(1000,"cache");
+    rv_massZErr->setBins(100,"cache");
 
 }
 
@@ -109,6 +114,7 @@ Bool_t MySelector::Process(Long64_t entry)
    if (doLambda1 == 1) {
 
       rv_massZErr->setVal(*massZErr);
+//      massZ_massZErr->Fill(*massZ, *massZErr);
 
       } else {
 
@@ -127,6 +133,8 @@ Bool_t MySelector::Process(Long64_t entry)
 
              double new_massZErr = TMath::Sqrt(dm1*dm1+dm2*dm2);
              rv_massZErr->setVal(new_massZErr);              
+         
+//             massZ_massZErr->Fill(*massZ, new_massZErr);
 
              }
 

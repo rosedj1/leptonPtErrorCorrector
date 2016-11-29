@@ -5,7 +5,6 @@ from math import *
 from tdrStyle import *
 from subprocess import call
 RooMsgService.instance().setStreamStatus(1,False);
-
 setTDRStyle()
 
 class GetCorrection():
@@ -14,17 +13,25 @@ class GetCorrection():
 
           self.selectors = {}
 
-          if not doLambda1:
-             self.pTLow_1st = {'e': 7, 'mu': 40}
-             self.pTHigh_1st = {'e': 100, 'mu': 50}
-             self.etaLow_1st = {'e': 0, 'mu': 0}
-             self.etaHigh_1st = {'e': 1, 'mu': 0.9}
-          else:
-             self.pTLow_1st = {'e': binEdge['pTLow'], 'mu': binEdge['pTLow']}
-             self.pTHigh_1st = {'e': binEdge['pTHigh'], 'mu': binEdge['pTHigh']}
-             self.etaLow_1st = {'e': binEdge['etaLow'], 'mu': binEdge['etaLow']}
-             self.etaHigh_1st = {'e': binEdge['etaHigh'], 'mu': binEdge['etaHigh']}
+#          if not doLambda1:
+#             self.pTLow_1st = {'e': 7, 'mu': 40}
+#             self.pTHigh_1st = {'e': 100, 'mu': 50}
+#             self.etaLow_1st = {'e': 0, 'mu': 0}
+#             self.etaHigh_1st = {'e': 1, 'mu': 0.9}
+#          else:
+          self.doLambda1 = doLambda1[0]
 
+          self.pTLow_1st = binEdge['pTLow']
+          self.pTHigh_1st = binEdge['pTHigh']
+          self.etaLow_1st = binEdge['etaLow']
+          self.etaHigh_1st = binEdge['etaHigh']
+
+          if not self.doLambda1:
+             self.pTLow_1st = doLambda1[1]['pTLow']
+             self.pTHigh_1st = doLambda1[1]['pTHigh']
+             self.etaLow_1st = doLambda1[1]['etaLow']
+             self.etaHigh_1st = doLambda1[1]['etaHigh']
+             
           self.massZ_lo = 60
           self.massZ_hi = 120
           self.massZErr_lo = 0.2
@@ -43,7 +50,6 @@ class GetCorrection():
                           'lambda': 1}
 
           self.fs = fs
-          self.doLambda1 = doLambda1
           #cut to make dataset
           self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
 #          self.cut = " (massZ > 60 && massZ < 120) && "
@@ -80,11 +86,15 @@ class GetCorrection():
           self.Data_Zlls = RooDataSet()
           self.Data_Zlls_w = RooDataSet()
           self.Data_Zlls_binned = RooDataHist()
+#          self.DataHist = TH2F()
  
           self.rFit = RooFitResult() 
 
 
       def PrepareDataset(self):
+
+#          massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
+#          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
 
           cut = self.cut
           self.tree.Draw(">>myList", cut, "entrylist")
@@ -100,10 +110,8 @@ class GetCorrection():
           self.tree.Process(selector)
 
           self.Data_Zlls = selector.Data_Zlls
-
           self.Data_Zlls_w = RooDataSet(self.Data_Zlls.GetName(), self.Data_Zlls.GetTitle(), self.Data_Zlls, self.Data_Zlls.get(), "1", "weight")
           print "dataset has " + str(self.Data_Zlls_w.numEntries()) + " events"
-
           self.Data_Zlls_binned = self.Data_Zlls_w.binnedClone()
 
       def MakeModel_getPara(self):
@@ -147,6 +155,9 @@ class GetCorrection():
           #variables
           massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
           massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
+#          massZ.setBins(1000,"cahe")
+#          massZ.setMin("cache",50.5) 
+#          massZ.setMax("cache",130.5) ;
           #BreitWigner
           breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", self.GENZ_mean)
           breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", self.GENZ_width)
@@ -196,10 +207,10 @@ class GetCorrection():
 
           if self.Data_Zlls_w.numEntries() < 5000:
              self.rFit = self.w.pdf("model").fitTo( self.Data_Zlls_w, RooFit.ConditionalObservables( RooArgSet(self.w.var("massZErr")) ),\
-                                                    RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE), RooFit.PrintLevel(-1), RooFit.Timer(kTRUE) )
+                                                    RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE), RooFit.PrintLevel(-9999), RooFit.Timer(kTRUE) )
           else:
              self.rFit = self.w.pdf("model").fitTo( self.Data_Zlls_binned, RooFit.ConditionalObservables( RooArgSet(self.w.var("massZErr")) ),\
-                                                    RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE), RooFit.PrintLevel(-1), RooFit.Timer(kTRUE) )
+                                                    RooFit.Save(kTRUE), RooFit.SumW2Error(kTRUE), RooFit.PrintLevel(-9999), RooFit.Timer(kTRUE) )
 
       def AfterFit_getPara(self):
 
@@ -314,11 +325,11 @@ class GetCorrection():
         
       def doLambdaCut(self):
 
-          lep1InBin1 = " (pT1 > " + str(self.pTLow_1st[self.fs]) + " && pT1 < " + str(self.pTHigh_1st[self.fs]) + ")"
-          lep1InBin1 += " && (abs(eta1) > " + str(self.etaLow_1st[self.fs]) + " && abs(eta1) < " + str(self.etaHigh_1st[self.fs]) + ")"
+          lep1InBin1 = " (pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+          lep1InBin1 += " && (abs(eta1) > " + str(self.etaLow_1st) + " && abs(eta1) < " + str(self.etaHigh_1st) + ")"
 
-          lep2InBin1 = " (pT2 > " + str(self.pTLow_1st[self.fs]) + " && pT2 < " + str(self.pTHigh_1st[self.fs]) + ")"
-          lep2InBin1 += " && (abs(eta2) > " + str(self.etaLow_1st[self.fs]) + " && abs(eta2) < " + str(self.etaHigh_1st[self.fs]) + ")"
+          lep2InBin1 = " (pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+          lep2InBin1 += " && (abs(eta2) > " + str(self.etaLow_1st) + " && abs(eta2) < " + str(self.etaHigh_1st) + ")"
 
           lep1InBin2 = " (pT1 > " + str(self.pTLow) + " && pT1 < " + str(self.pTHigh) + ")"
           lep1InBin2 += " && (abs(eta1) > " + str(self.etaLow) + " && abs(eta1) < " + str(self.etaHigh) + ")"
