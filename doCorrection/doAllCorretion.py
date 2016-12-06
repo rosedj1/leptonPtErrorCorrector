@@ -89,7 +89,7 @@ def doLambda2(pTRange, etaRange, inpath, outpath, fs, isData, lambda1Info, itera
     lambdas = lambdas_tagged[1]
     lambdas['lambda2'] *= lambdas['lambda']
 
-    if (lambdas['lambda'] - 1) < 0.01:
+    if (abs(lambdas['lambda'] - 1)) < 0.01:
        return lambdas_tagged
 
     while (needMoreCorrection):
@@ -110,7 +110,7 @@ def doLambda2(pTRange, etaRange, inpath, outpath, fs, isData, lambda1Info, itera
           lambdas = lambdas_tagged[1]
           lambdas['lambda2'] *= lambdas['lambda']
 
-          if (lambdas['lambda'] - 1) < 0.01 or iteration == iterationMax:
+          if (abs(lambdas['lambda'] - 1)) < 0.01 or iteration == iterationMax:
              needMoreCorrection = False
 
     return lambdas_tagged
@@ -212,18 +212,20 @@ def doElectron(electronPt, electronEta, inpath, outpath, isData, firstBin):
 
 
 
+#inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut/'
 inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/'
-outpath = '/home/mhl/public_html/2016/20161125_mass/test/'
+outpath = '/home/mhl/public_html/2016/20161206_mass/correction/'
 
 muonPt = [5,100]
 muonEta = [0, 0.9, 1.8, 2.4]
 
-#electronPt = [7,30,60,100]
+#electronPt = [7, 40,50,100]
 electronPt = [7,100]
-electronEta = [0,0.7,1,1.2,1.44,1.57,2,2.5]
+electronEta = [0,0.8,1,1.2,1.45,1.57,2,2.1,2.5]
+#electronEta = [0,0.8,1.5,2.5]
 
 #doMuon(muonPt, muonEta, inpath, outpath, False)
-#doElectron(electronPt, electronEta, inpath, outpath, False, [7,100,0,0.8])
-doLambda1s(electronPt, electronEta, inpath, outpath, False, 'e')
+doElectron(electronPt, electronEta, inpath, outpath, False, [7,100,0,0.8])
+#doLambda1s(electronPt, electronEta, inpath, outpath, False, 'e')
 
 call('cp lambdas_singleCB/DYJetsToLL_M-50_m2eLUT_m2e.root /raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_HZZ4L/packages/doClosure/ZClosure/LUT_2e.root',shell=True)

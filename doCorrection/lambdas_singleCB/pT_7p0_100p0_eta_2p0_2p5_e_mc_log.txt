@@ -1,9 +1,0 @@
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.1792110208950761}
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.1792110208950761}
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.069858400354406}
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.1792110208950761}
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.178127333002428}
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.1893702857538224}
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.1792110208950761}
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.1893702857538224}
-iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.177578543790237}

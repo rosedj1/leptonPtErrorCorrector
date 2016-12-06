@@ -1,1 +1,1 @@
-lambdas = {'lambda1': 1.24731268371, 'lambda2': 1.0, 'lambda': 1.1172719322325004}
+lambdas = {'lambda1': 1.24203760284, 'lambda2': 1.0, 'lambda': 1.1144922576756817}

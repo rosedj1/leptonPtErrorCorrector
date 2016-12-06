@@ -54,11 +54,12 @@ void MySelector::Begin(TTree * /*tree*/)
 
 //   massZ_massZErr = new TH2F("massZ_massZErr", "", 300, massZ_lo, massZ_hi, 100, massZErr_lo, massZErr_hi);
 
-//   rv_massZ->setBins(300,"fft");
-//   rv_massZErr->setBins(50,"fft");
 
-    rv_massZ->setBins(1000,"cache");
-    rv_massZErr->setBins(100,"cache");
+   rv_massZ->setBins(30, "cache");
+//    rv_massZ->setMin("cache", 50.5);
+//    rv_massZ->setMax("cache", 130.5);
+//    rv_massZ->setRange("subrange",60,120);
+    rv_massZErr->setBins(30);
 
 }
 

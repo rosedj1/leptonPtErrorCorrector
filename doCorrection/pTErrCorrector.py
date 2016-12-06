@@ -32,13 +32,17 @@ class GetCorrection():
              self.etaLow_1st = doLambda1[1]['etaLow']
              self.etaHigh_1st = doLambda1[1]['etaHigh']
              
+#          self.massZ_lo = 80
+#          self.massZ_hi = 100
           self.massZ_lo = 60
           self.massZ_hi = 120
-          self.massZErr_lo = 0.2
-          self.massZErr_hi = 7.2
+          self.massZErr_lo = 0
+          self.massZErr_hi = 10
 
           self.GENZ_mean = 91.19
+#          self.GENZ_width = 2.37
           self.GENZ_width = 2.44
+
 
           self.pTLow = binEdge['pTLow']
           self.pTHigh = binEdge['pTHigh']
@@ -137,6 +141,8 @@ class GetCorrection():
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
           #GENZ shape convoluted with crystal ball
 #          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
+
+
           CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
           #bkg
           tau = RooRealVar("tau","tau",  -1, 1)
