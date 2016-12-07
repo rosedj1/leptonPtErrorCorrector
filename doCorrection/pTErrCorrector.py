@@ -55,7 +55,7 @@ class GetCorrection():
 
           self.fs = fs
           #cut to make dataset
-          self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
+          self.cut = " ( massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
 #          self.cut = " (massZ > 60 && massZ < 120) && "
           self.cut += " (massZErr > "+str(self.massZErr_lo)+" && massZErr < "+str(self.massZErr_hi)+") && "
 
@@ -331,16 +331,16 @@ class GetCorrection():
         
       def doLambdaCut(self):
 
-          lep1InBin1 = " (pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+          lep1InBin1 = " (lep1_ecalDriven && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
           lep1InBin1 += " && (abs(eta1) > " + str(self.etaLow_1st) + " && abs(eta1) < " + str(self.etaHigh_1st) + ")"
 
-          lep2InBin1 = " (pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+          lep2InBin1 = " (lep2_ecalDriven && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
           lep2InBin1 += " && (abs(eta2) > " + str(self.etaLow_1st) + " && abs(eta2) < " + str(self.etaHigh_1st) + ")"
 
-          lep1InBin2 = " (pT1 > " + str(self.pTLow) + " && pT1 < " + str(self.pTHigh) + ")"
+          lep1InBin2 = " (!lep1_ecalDriven && pT1 > " + str(self.pTLow) + " && pT1 < " + str(self.pTHigh) + ")"
           lep1InBin2 += " && (abs(eta1) > " + str(self.etaLow) + " && abs(eta1) < " + str(self.etaHigh) + ")"
 
-          lep2InBin2 = " (pT2 > " + str(self.pTLow) + " && pT2 < " + str(self.pTHigh) + ")"
+          lep2InBin2 = " (!lep2_ecalDriven && pT2 > " + str(self.pTLow) + " && pT2 < " + str(self.pTHigh) + ")"
           lep2InBin2 += " && (abs(eta2) > " + str(self.etaLow) + " && abs(eta2) < " + str(self.etaHigh) + ")"
 
           if self.doLambda1:
