@@ -331,10 +331,10 @@ class GetCorrection():
         
       def doLambdaCut(self):
 
-          lep1InBin1 = " (lep1_ecalDriven && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+          lep1InBin1 = " (pterr1/genLep_pt1 < 0.03 && lep1_ecalDriven && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
           lep1InBin1 += " && (abs(eta1) > " + str(self.etaLow_1st) + " && abs(eta1) < " + str(self.etaHigh_1st) + ")"
 
-          lep2InBin1 = " (lep2_ecalDriven && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+          lep2InBin1 = " (pterr2/genLep_pt2 < 0.03 && lep2_ecalDriven && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
           lep2InBin1 += " && (abs(eta2) > " + str(self.etaLow_1st) + " && abs(eta2) < " + str(self.etaHigh_1st) + ")"
 
           lep1InBin2 = " (!lep1_ecalDriven && pT1 > " + str(self.pTLow) + " && pT1 < " + str(self.pTHigh) + ")"

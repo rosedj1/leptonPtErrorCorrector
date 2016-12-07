@@ -2,3 +2,4 @@ iteration 4: {'lambda1': 1.23084634071, 'lambda2': 2.39314984417, 'lambda': 1.01
 iteration 4: {'lambda1': 1.23084965696, 'lambda2': 2.44160014843, 'lambda': 1.0027787915369002}
 iteration 4: {'lambda1': 1.23084965696, 'lambda2': 2.44160014843, 'lambda': 1.0027787915369002}
 iteration 4: {'lambda1': 1.23084965696, 'lambda2': 2.44160014843, 'lambda': 1.0027787915369002}
+iteration 4: {'lambda1': 1.26956603439, 'lambda2': 2.44685896646, 'lambda': 1.0010206545147093}
