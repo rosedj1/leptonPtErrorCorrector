@@ -55,7 +55,7 @@ class GetCorrection():
 
           self.fs = fs
           #cut to make dataset
-          self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
+          self.cut = " (lep1_ecalDriven && lep2_ecalDriven && massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
 #          self.cut = " (massZ > 60 && massZ < 120) && "
           self.cut += " (massZErr > "+str(self.massZErr_lo)+" && massZErr < "+str(self.massZErr_hi)+") && "
 
@@ -176,7 +176,7 @@ class GetCorrection():
           n = RooRealVar("n","n", self.shapePara["n"])
           #alpha2 = RooRealVar("alpha2","alpha2", self.shapePara["alpha2"])
           #n2 = RooRealVar("n2","n2", self.shapePara["n2"])
-          lambda_ = RooRealVar("lambda","lambda", 1, 0.7, 1.3)
+          lambda_ = RooRealVar("lambda","lambda", 1, 0, 10)
 #          sigma = RooFormulaVar("sigma","@1*(1+@2/@1*@0)", RooArgList(lambda_, massZ, massZErr))
           sigma = RooFormulaVar("sigma","@1*@0", RooArgList(lambda_,  massZErr))
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
