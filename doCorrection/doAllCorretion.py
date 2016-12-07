@@ -221,7 +221,7 @@ muonEta = [0, 0.9, 1.8, 2.4]
 
 #electronPt = [7, 40,50,100]
 electronPt = [7,100]
-electronEta = [0,0.8,1,1.2,1.45,1.57,2,2.5]
+electronEta = [0,0.8,1,1.2,1.44,1.57,2,2.5]
 #electronEta = [0,0.8,1.5,2.5]
 
 #doMuon(muonPt, muonEta, inpath, outpath, False)
