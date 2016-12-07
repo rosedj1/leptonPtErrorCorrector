@@ -214,18 +214,19 @@ def doElectron(electronPt, electronEta, inpath, outpath, isData, firstBin):
 
 inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut/'
 #inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/'
-outpath = '/home/mhl/public_html/2016/20161207_mass/scratch/'
+outpath = '/home/mhl/public_html/2016/20161207_mass/scratch/'#_LargeRelPtErr/'
 
 muonPt = [5,100]
 muonEta = [0, 0.9, 1.8, 2.4]
 
 #electronPt = [7, 40,50,100]
-electronPt = [7,50, 100]
+electronPt = [7,100]
 electronEta = [0,0.8,1,1.2,1.44,1.57,2,2.5]
-#electronEta = [0,0.8,1.5,2.5]
+#electronEta = [0,2.5]
+
 
 #doMuon(muonPt, muonEta, inpath, outpath, False)
-doElectron(electronPt, electronEta, inpath, outpath, False, [7,50,0,0.8])
-#doLambda1s(electronPt, electronEta, inpath, outpath, False, 'e')
+#doElectron(electronPt, electronEta, inpath, outpath, False, [7,100,0,0.8])
+doLambda1s(electronPt, electronEta, inpath, outpath, False, 'e')
 
 call('cp lambdas_singleCB/DYJetsToLL_M-50_m2eLUT_m2e.root /raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_HZZ4L/packages/doClosure/ZClosure/LUT_2e.root',shell=True)

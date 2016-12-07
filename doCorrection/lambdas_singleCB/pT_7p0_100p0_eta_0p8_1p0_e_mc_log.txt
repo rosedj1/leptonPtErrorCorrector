@@ -1,2 +1,7 @@
 iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.2972983927290693}
 iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.2913110350951302}
+iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.2913110350951302}
+iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 0.044490228768272466}
+iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.3202729765548316}
+iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.3497505587408947}
+iteration -1: {'lambda1': 1.0, 'lambda2': 1.0, 'lambda': 1.3202729765548316}

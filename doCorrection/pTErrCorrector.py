@@ -55,7 +55,7 @@ class GetCorrection():
 
           self.fs = fs
           #cut to make dataset
-          self.cut = " (lep1_ecalDriven && lep2_ecalDriven && massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
+          self.cut = " (pterr1/genLep_pt1 < 0.06 && pterr2/genLep_pt2 < 0.06 && lep1_ecalDriven && lep2_ecalDriven && massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
 #          self.cut = " (massZ > 60 && massZ < 120) && "
           self.cut += " (massZErr > "+str(self.massZErr_lo)+" && massZErr < "+str(self.massZErr_hi)+") && "
 
