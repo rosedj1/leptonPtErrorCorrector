@@ -214,15 +214,15 @@ def doElectron(electronPt, electronEta, inpath, outpath, isData, firstBin):
 
 inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut/'
 #inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/'
-outpath = '/home/mhl/public_html/2016/20161207_mass/nonecalDriven/'
+outpath = '/home/mhl/public_html/2016/20161207_mass/scratch/'
 
 muonPt = [5,100]
 muonEta = [0, 0.9, 1.8, 2.4]
 
 #electronPt = [7, 40,50,100]
-electronPt = [7,100]
+electronPt = [7, 100]
 #electronEta = [0,0.8,1,1.2,1.45,1.57,2,2.5]
-electronEta = [0,1.44,2.5]
+electronEta = [0,1.44,1.6,2,2.5]
 
 #doMuon(muonPt, muonEta, inpath, outpath, False)
 doElectron(electronPt, electronEta, inpath, outpath, False, [7,100,0,0.8])
