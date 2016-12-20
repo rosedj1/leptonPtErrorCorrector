@@ -214,7 +214,7 @@ def doElectron(electronPt, electronEta, inpath, outpath, isData, firstBin):
 
 inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut/'
 #inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/'
-outpath = '/home/mhl/public_html/2016/20161207_electronCorr/eta_1_2p5_relPtErr_0_0p06/'
+outpath = '/home/mhl/public_html/2016/20161207_electronCorr/eta_1_2p5_relPtErr_0_0p07/'
 
 muonPt = [5,100]
 muonEta = [0, 0.9, 1.8, 2.4]
