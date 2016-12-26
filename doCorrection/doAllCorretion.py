@@ -257,15 +257,15 @@ inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/Data_2015D/'
 #inpath = '/raid/raid9/mhl/HZZ4L_Run2/HZZ4L/PereventMassErrCorr_2016ICHEP/getCorrection_ICHEP2016/inputRoot/'
 #inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/'
 #inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_76X/'
-outpath = '/home/mhl/public_html/2016/20161226_eCorr_2015/eCorr/'
+outpath = '/home/mhl/public_html/2016/20161226_eCorr_2015/eCorr_ecalDriven_eta_1_2p5/'
 
 muonPt = [5,100]
 muonEta = [0,0.9,1.8,2.4]
 
 #electronPt = [7, 40,50,100]
 electronPt = [7,100]
-electronEta = [0,0.8,1,1.2,1.44,1.57,2,2.5]
-#electronEta = [1,1.2,1.44,1.57,2,2.5]
+#electronEta = [0,0.8,1]#,1.2,1.44,1.57,2,2.5]
+electronEta = [1,1.2,1.44,1.57,2,2.5]
 
 
 #doMuon(muonPt, muonEta, inpath, outpath, False)
