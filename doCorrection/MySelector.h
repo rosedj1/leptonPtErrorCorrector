@@ -46,7 +46,7 @@ public :
    TTreeReaderValue<Double_t> pterr2old = {fReader, "pterr2old"};
    TTreeReaderValue<Double_t> Met = {fReader, "Met"};
    TTreeReaderValue<Double_t> weight = {fReader, "weight"};
-   TTreeReaderValue<Double_t> genzm = {fReader, "genzm"};
+/*   TTreeReaderValue<Double_t> genzm = {fReader, "genzm"};
    TTreeReaderValue<Double_t> GENmass2l = {fReader, "GENmass2l"};
    TTreeReaderValue<Double_t> genLep_pt1 = {fReader, "genLep_pt1"};
    TTreeReaderValue<Double_t> genLep_pt2 = {fReader, "genLep_pt2"};
@@ -57,7 +57,7 @@ public :
    TTreeReaderValue<Int_t> nFSRPhotons = {fReader, "nFSRPhotons"};
    TTreeReaderValue<Int_t> lep1_ecalDriven = {fReader, "lep1_ecalDriven"};
    TTreeReaderValue<Int_t> lep2_ecalDriven = {fReader, "lep2_ecalDriven"};
-
+*/
    RooRealVar* rv_weight; 
    RooRealVar* rv_massZ;  
    RooRealVar* rv_massZErr; 

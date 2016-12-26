@@ -256,7 +256,7 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
 
         for(int mcfmEvt_HZZ=0; mcfmEvt_HZZ < tree->GetEntries(); mcfmEvt_HZZ++) { //event loop
             tree->GetEntry(mcfmEvt_HZZ);
-//            if(!passedTrig) continue;
+            if(!passedTrig) continue;
             if((*lep_id).size()<2) continue;
             vector<int> passLepIndex;
             for(unsigned int il=0; il<(*lep_pt).size(); il++){
@@ -294,13 +294,13 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
 */
             phi1 = double((*lep_phi)[L1]); m1 = double((*lep_phi)[L1]);
             phi2 = double((*lep_phi)[L2]); m2 = double((*lep_phi)[L2]);
-            pT1 = (*lepFSR_pt)[L1]; pT2 = (*lepFSR_pt)[L2];
-//            pT1 = (*lep_pt)[L1]; pT2 = (*lep_pt)[L2];
+//            pT1 = (*lepFSR_pt)[L1]; pT2 = (*lepFSR_pt)[L2];
+            pT1 = (*lep_pt)[L1]; pT2 = (*lep_pt)[L2];
 
-            lep1.SetPtEtaPhiM(double((*lepFSR_pt)[L1]),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-            lep2.SetPtEtaPhiM(double((*lepFSR_pt)[L2]),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
-//            lep1.SetPtEtaPhiM(double((*lep_pt)[L1]),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-//            lep2.SetPtEtaPhiM(double((*lep_pt)[L2]),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+//            lep1.SetPtEtaPhiM(double((*lepFSR_pt)[L1]),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+//            lep2.SetPtEtaPhiM(double((*lepFSR_pt)[L2]),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+            lep1.SetPtEtaPhiM(double((*lep_pt)[L1]),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+            lep2.SetPtEtaPhiM(double((*lep_pt)[L2]),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
 
             massZ = (lep1+lep2).M();
             pterr1 = double((*lep_pterr)[L1]); pterr2 = double((*lep_pterr)[L2]);
@@ -309,20 +309,20 @@ void ReadTree(TTree* tree, TString fs, TTree* & newtree){
 //            if(massZ<80 || massZ>100) continue;
 
             TLorentzVector lep1p, lep2p;
-//            lep1p.SetPtEtaPhiM(double((*lep_pt)[L1]+pterr1),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-//            lep2p.SetPtEtaPhiM(double((*lep_pt)[L2]+pterr2),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
-            lep1p.SetPtEtaPhiM(double((*lepFSR_pt)[L1]+pterr1),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-            lep2p.SetPtEtaPhiM(double((*lepFSR_pt)[L2]+pterr2),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+            lep1p.SetPtEtaPhiM(double((*lep_pt)[L1]+pterr1),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+            lep2p.SetPtEtaPhiM(double((*lep_pt)[L2]+pterr2),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+//            lep1p.SetPtEtaPhiM(double((*lepFSR_pt)[L1]+pterr1),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+//            lep2p.SetPtEtaPhiM(double((*lepFSR_pt)[L2]+pterr2),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
 
             double dm1 = (lep1p+lep2).M()-(lep1+lep2).M();
             double dm2 = (lep1+lep2p).M()-(lep1+lep2).M();
  
             massZErr = TMath::Sqrt(dm1*dm1+dm2*dm2);
 
-            lep1p.SetPtEtaPhiM(double((*lepFSR_pt)[L1]+pterr1old),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-            lep2p.SetPtEtaPhiM(double((*lepFSR_pt)[L2]+pterr2old),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
-//            lep1p.SetPtEtaPhiM(double((*lep_pt)[L1]+pterr1old),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
-//            lep2p.SetPtEtaPhiM(double((*lep_pt)[L2]+pterr2old),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+//            lep1p.SetPtEtaPhiM(double((*lepFSR_pt)[L1]+pterr1old),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+//            lep2p.SetPtEtaPhiM(double((*lepFSR_pt)[L2]+pterr2old),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
+            lep1p.SetPtEtaPhiM(double((*lep_pt)[L1]+pterr1old),double((*lep_eta)[L1]),double((*lep_phi)[L1]),double((*lep_mass)[L1]));
+            lep2p.SetPtEtaPhiM(double((*lep_pt)[L2]+pterr2old),double((*lep_eta)[L2]),double((*lep_phi)[L2]),double((*lep_mass)[L2]));
 
             dm1 = (lep1p+lep2).M()-(lep1+lep2).M();
             dm2 = (lep1+lep2p).M()-(lep1+lep2).M();

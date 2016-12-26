@@ -1,2 +1,0 @@
-iteration 0: {'lambda1': 1.23084965696, 'lambda2': 1.0, 'lambda': 0.8622230369611478}
-iteration 0: {'lambda1': 1.23084965696, 'lambda2': 1.0, 'lambda': 0.8622230369611478}

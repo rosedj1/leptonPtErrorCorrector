@@ -69,7 +69,7 @@ def doLambda2(pTRange, etaRange, inpath, outpath, fs, isData, lambda1Info, itera
         + ' --etaLow '  + str(etaRange[0]) + ' --etaHigh ' + str(etaRange[1]) \
         + ' --ptLow_lambda1 ' + str(lambda1_pt[0]) + ' --ptHigh_lambda1 ' + str(lambda1_pt[1]) \
         + ' --etaLow_lambda1 '  + str(lambda1_eta[0]) + ' --etaHigh_lambda1 ' + str(lambda1_eta[1]) \
-        + ' --fs ' + fs + ' --doPara --lambdas ' + str(lambda1) + ' 1 --iteration 0' \
+        + ' --fs ' + fs + ' --doPara --lambdas ' + str(lambda1) + ' 1 --iteration 0 ' \
         + ' --inpath ' + inpath + ' --outpath ' + outpath + ';'
 
     cmd+= ' python doCorrection.py \
@@ -77,7 +77,7 @@ def doLambda2(pTRange, etaRange, inpath, outpath, fs, isData, lambda1Info, itera
         + ' --etaLow '  + str(etaRange[0]) + ' --etaHigh ' + str(etaRange[1]) \
         + ' --ptLow_lambda1 ' + str(lambda1_pt[0]) + ' --ptHigh_lambda1 ' + str(lambda1_pt[1]) \
         + ' --etaLow_lambda1 '  + str(lambda1_eta[0]) + ' --etaHigh_lambda1 ' + str(lambda1_eta[1]) \
-        + ' --fs ' + fs + ' --lambdas ' + str(lambda1) + ' 1 --iteration 0' \
+        + ' --fs ' + fs + ' --lambdas ' + str(lambda1) + ' 1 --iteration 0 ' \
         + ' --inpath ' + inpath + ' --outpath ' + outpath
 
     call(cmd, shell=True)
@@ -102,7 +102,7 @@ def doLambda2(pTRange, etaRange, inpath, outpath, fs, isData, lambda1Info, itera
               + ' --etaLow '  + str(etaRange[0]) + ' --etaHigh ' + str(etaRange[1]) \
               + ' --ptLow_lambda1 ' + str(lambda1_pt[0]) + ' --ptHigh_lambda1 ' + str(lambda1_pt[1]) \
               + ' --etaLow_lambda1 '  + str(lambda1_eta[0]) + ' --etaHigh_lambda1 ' + str(lambda1_eta[1]) \
-              + ' --fs ' + fs + ' --lambdas ' + str(lambda1) + ' ' + str(lambda2) + ' --iteration ' + str(iteration)\
+              + ' --fs ' + fs + ' --lambdas ' + str(lambda1) + ' ' + str(lambda2) + ' --iteration ' + str(iteration) \
               + ' --inpath ' + inpath + ' --outpath ' + outpath 
 
           call(cmd, shell=True)          
@@ -174,8 +174,9 @@ def doMuon(muonPt, muonEta, inpath, outpath, isData):
     tasks = []
 
     #split jobs into different process
-    for i in range(len(muonEta)-1):
-        tasks.append( (muonPt, [muonEta[i],muonEta[i+1]], inpath, outpath, 'mu', isData) )
+    for i in range(len(muonPt)-1):
+        for j in range(len(muonEta)-1):
+            tasks.append( ([muonPt[i], muonPt[i+1]], [muonEta[j],muonEta[j+1]], inpath, outpath, 'mu', isData) )
 
     results = [pool.apply_async( doLambda1, t ) for t in tasks]
    
@@ -210,14 +211,40 @@ def doElectron(electronPt, electronEta, inpath, outpath, isData, firstBin):
 
     MakeLUT(electronPt, electronEta, allLambdas, isData, 'e', outpath, False)
 
+def doLambda2s(Pt, Eta, inpath, outpath, isData, firstBin, fs):
+
+    lambda1 = doLambda1([firstBin[0],firstBin[1]], [firstBin[2],firstBin[3]], inpath, outpath, fs, isData)
+
+    pool = multiprocessing.Pool( (len(Eta) -1)*(len(Pt) - 1) )
+    tasks = []
+
+    #split jobs into different process
+    for i in range(len(Pt)-1):
+        for j in range(len(Eta)-1):
+            tasks.append( ([Pt[i], Pt[i+1]], [Eta[j], Eta[j+1]], inpath, outpath, fs, isData, \
+                           [[firstBin[0],firstBin[1]], [firstBin[2],firstBin[3]],lambda1[1]['lambda']], 10) )
+
+    results = [pool.apply_async( doLambda2, t ) for t in tasks]
+
+    allLambdas = []
+    for result in results:
+        (lambdas) = result.get()
+        allLambdas.append(lambdas)
+        print lambdas
+
+    MakeLUT(Pt, Eta, allLambdas, isData, fs, outpath, False)
 
 
-inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut/'
+#inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/Data_2016_v1/'
+#inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/Data_2015D/'
+#inpath = '/raid/raid9/mhl/HZZ4L_Run2/HZZ4L/PereventMassErrCorr_2016ICHEP/PereventMassErrCorr_v0_forData/'
+#inpath = '/raid/raid9/mhl/HZZ4L_Run2/HZZ4L/PereventMassErrCorr_2016ICHEP/getCorrection_ICHEP2016/inputRoot/'
 #inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/'
-outpath = '/home/mhl/public_html/2016/20161207_electronCorr/eta_1_2p5_relPtErr_0_0p07/'
+inpath = '/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_76X/'
+outpath = '/home/mhl/public_html/2016/20161224_muCorr_MC/muCorr/'
 
 muonPt = [5,100]
-muonEta = [0, 0.9, 1.8, 2.4]
+muonEta = [0,0.9,1.8,2.4]
 
 #electronPt = [7, 40,50,100]
 electronPt = [7,100]
@@ -225,8 +252,12 @@ electronPt = [7,100]
 electronEta = [1,1.2,1.44,1.57,2,2.5]
 
 
-#doMuon(muonPt, muonEta, inpath, outpath, False)
-#doElectron(electronPt, electronEta, inpath, outpath, False, [7,100,0,0.8])
-doLambda1s(electronPt, electronEta, inpath, outpath, False, 'e')
+doMuon(muonPt, muonEta, inpath, outpath, False)
+#doLambda2s(muonPt, muonEta, inpath, outpath, True, [5,60,0,0.9], 'mu')
 
+#doElectron(electronPt, electronEta, inpath, outpath, False, [7,100,0,0.8])
+#doLambda1s(electronPt, electronEta, inpath, outpath, False, 'e')
+
+#call('cp lambdas_singleCB/DoubleLepton_m2muLUT_m2mu.root /raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_HZZ4L/packages/doClosure/ZClosure/LUT_2mu.root',shell=True)
+call('cp lambdas_singleCB/DYJetsToLL_M-50_m2muLUT_m2mu.root /raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_HZZ4L/packages/doClosure/ZClosure/LUT_2mu.root',shell=True)
 #call('cp lambdas_singleCB/DYJetsToLL_M-50_m2eLUT_m2e.root /raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/HiggsMass_HZZ4L/packages/doClosure/ZClosure/LUT_2e.root',shell=True)

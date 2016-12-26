@@ -55,7 +55,8 @@ class GetCorrection():
 
           self.fs = fs
           #cut to make dataset
-          self.cut = " (pterr1/genLep_pt1 < 0.07 && pterr2/genLep_pt2 < 0.07 && lep1_ecalDriven && lep2_ecalDriven && massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
+          self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
+#          self.cut = " (pterr1/genLep_pt1 < 0.07 && pterr2/genLep_pt2 < 0.07 && lep1_ecalDriven && lep2_ecalDriven && massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
 #          self.cut = " (massZ > 60 && massZ < 120) && "
           self.cut += " (massZErr > "+str(self.massZErr_lo)+" && massZErr < "+str(self.massZErr_hi)+") && "
 
@@ -134,8 +135,6 @@ class GetCorrection():
           mean = RooRealVar("mean","mean", 0, -1, 1)
           alpha = RooRealVar("alpha","alpha", 1, 0, 10)
           n = RooRealVar("n","n", 5, 0, 30)
-          #alpha2 = RooRealVar("alpha2","alpha2", 1.2, 0, 50)
-          #n2 = RooRealVar("n2","n2", 15, 0.1, 50)
           sigma = RooRealVar("sigma", "sigma", 1, 0, 10)
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
@@ -171,13 +170,13 @@ class GetCorrection():
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
           #Crystalball
+#          mean = RooRealVar("mean","mean", 0, -1, 1)
+#          alpha = RooRealVar("alpha","alpha", 1, 0, 10)
+#          n = RooRealVar("n","n", 5, 0, 30)
           mean = RooRealVar("mean","mean", self.shapePara["mean"])
           alpha = RooRealVar("alpha","alpha", self.shapePara["alpha"])
           n = RooRealVar("n","n", self.shapePara["n"])
-          #alpha2 = RooRealVar("alpha2","alpha2", self.shapePara["alpha2"])
-          #n2 = RooRealVar("n2","n2", self.shapePara["n2"])
-          lambda_ = RooRealVar("lambda","lambda", 1, 0, 10)
-#          sigma = RooFormulaVar("sigma","@1*(1+@2/@1*@0)", RooArgList(lambda_, massZ, massZErr))
+          lambda_ = RooRealVar("lambda","lambda", 1.1, 0.7, 1.3)
           sigma = RooFormulaVar("sigma","@1*@0", RooArgList(lambda_,  massZErr))
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
@@ -189,6 +188,7 @@ class GetCorrection():
           CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
 
           tau = RooRealVar("tau","tau", self.shapePara["tau"])
+#          tau = RooRealVar("tau","tau",  -1, 1)
 #          pa1 = RooRealVar("pa1","pa1", self.shapePara["pa1"])
 #          pa2 = RooRealVar("pa2","pa2", self.shapePara["pa2"])
 #          p2 = RooFormulaVar("p2", "@1*@0+@2*@0*@0",RooArgList(massZ,pa1,pa2))
@@ -197,6 +197,7 @@ class GetCorrection():
 
           #fsig
           fsig = RooRealVar("fsig","signal fraction", self.shapePara["fsig"])
+#          fsig = RooRealVar("fsig","signal fraction", 0.7, 0.5, 1)
           model = RooAddPdf("model","model", CBxBW, bkg, fsig)
           
           getattr(self.w,'import')(model)
@@ -242,7 +243,7 @@ class GetCorrection():
 
       def PlotFit(self):
 
-          PmassZ = self.w.var("massZ").frame(RooFit.Bins(100))
+          PmassZ = self.w.var("massZ").frame(RooFit.Bins(300))
           PmassZ.GetXaxis().SetTitle("massZ(GeV)")
           PmassZ.GetYaxis().SetTitleOffset(1.3)
 
