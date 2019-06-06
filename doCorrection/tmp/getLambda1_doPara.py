@@ -47,14 +47,17 @@ def ParseOption():
 
 args=ParseOption()
 
+## 5 parameters passed in from doLambda1.sh
 pTLow = args.ptLow
 pTHigh = args.ptHigh
 etaLow = args.etaLow
 etaHigh = args.etaHigh
 binEdge = {'pTLow': pTLow, 'pTHigh':pTHigh, 'etaLow':etaLow, 'etaHigh':etaHigh}
-isData = args.isData
 fs = args.fs
+isData = args.isData
 doLambda1 = True
+#____________________________________________________________________________________________________
+#
 lambdas = {'lambda1':1, 'lambda2':1}
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
 
@@ -62,21 +65,23 @@ path = {}
 #path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"
 #path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/"
 #path['input'] = "/raid/raid7/rosedj1/ForPeeps/ForFilippo/"
-path['input'] = "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/"
+path['input']  = "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/"
 path['output'] = "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlots/" #getLambda1/"
 #path['output'] = "/home/mhl/public_html/2016/20161125_mass/test/" #getLambda1/"
 
 tag = "doLambda1_getPara_" + fs
 
-# Get CB parameters
+### Get CB parameters
 # makes a GetCorrection object
-# shapePara starts off with all zeros, then it goes through the grind, and they get updated
-# 
+# shapePara starts off with all zeros
 getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag) 
-getCorr_getPara.DriverGetPara()
-
 if DEBUG:
-    getCorr_getPara.
+    print "Parameters of getCorr_getPara objects BEFORE fit:", getCorr_getPara.__dict__
+
+# then it goes through the grind, and the parameters get updated
+getCorr_getPara.DriverGetPara()
+if DEBUG:
+    print "Parameters of getCorr_getPara objects AFTER fit:", getCorr_getPara.__dict__
 
 # here is where the shapeParameters gets updated
 shapePara = getCorr_getPara.shapePara

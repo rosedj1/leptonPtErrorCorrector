@@ -1,3 +1,4 @@
+// WARNING! This file may have bad RelIso cuts. If you want to use the good skimmer go to /HiggsMassMeas/CMSSW_8_0_10
 
 #ifndef __CINT__
 #include "RooGlobalFunc.h"

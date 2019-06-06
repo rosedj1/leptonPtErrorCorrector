@@ -1,5 +1,20 @@
+#!/bin/bash
+#####################################################################################################
+## PURPOSE: 
+## SYNTAX:  
+## NOTES:   Applies the following cuts: 60<mZ<120, 0.2<mZerr<7.2, and various pT and eta cuts
+##          depending on what flags are passed to: doLambda1.sh
+## AUTHOR:  Hualin Mei
+## DATE:    
+## UPDATED: 
+## TO-DO:   Add flag for inputfilename instead of hardcoding it below
+#####################################################################################################
+
+#____________________________________________________________________________________________________
+# User Parameters
 import ROOT, sys, os, string, re
-from ROOT import *
+# Probably don't need import ROOT
+from ROOT import * 
 from array import array
 from math import *
 from tdrStyle import *
@@ -7,78 +22,102 @@ from subprocess import call
 RooMsgService.instance().setStreamStatus(1,False);
 setTDRStyle()
 
+gROOT.SetBatch(kTRUE)   # kTRUE will NOT draw plots to screen
+
 class GetCorrection():
 
       def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
+      """
+      ARGUMENTS:
+        binEdge   =  {pTLow:<> ,pTHigh:<>, etaLow:<>, etaHigh:<>}
+        isData    = bool
+        fs        = 'e' or 'mu'
+        doLambda1 = bool. 
+                    If True: use binEdge values, else use hardcoded binEdge values below and
+                    apply pT and eta cuts to lep1 and lep2 assuming they are in SAME BIN.
+                    doLambda==True: leptons in same bin!       lep1 and lep2 both in bin1 (eta_1st vals)
+                    doLambda==False:leptons in different bins! (lep1 in bin1 and lep2 in bin2) or (lep1 in bin2 and lep2 in bin1)
+        lambdas   = {'lambda1':1, 'lambda2':1}
+        shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
+        paths     = {'input':<input_DIR_to_NTuple>, 'output':<output_DIR>}
+        tag       = "doLambda1_getPara_" + fs
+      """
 
-          self.selectors = {}
-
-#          if not doLambda1:
-#             self.pTLow_1st = {'e': 7, 'mu': 40}
-#             self.pTHigh_1st = {'e': 100, 'mu': 50}
-#             self.etaLow_1st = {'e': 0, 'mu': 0}
-#             self.etaHigh_1st = {'e': 1, 'mu': 0.9}
-#          else:
-          self.doLambda1 = doLambda1[0]
-
-          self.pTLow_1st = binEdge['pTLow']
-          self.pTHigh_1st = binEdge['pTHigh']
-          self.etaLow_1st = binEdge['etaLow']
-          self.etaHigh_1st = binEdge['etaHigh']
-
-          if not self.doLambda1:
-             self.pTLow_1st = doLambda1[1]['pTLow']
-             self.pTHigh_1st = doLambda1[1]['pTHigh']
-             self.etaLow_1st = doLambda1[1]['etaLow']
-             self.etaHigh_1st = doLambda1[1]['etaHigh']
-             
+          ## Hard-coded parameters
           self.massZ_lo = 60
           self.massZ_hi = 120
-          self.massZErr_lo = 0.2
-          self.massZErr_hi = 7.2
-
+          self.massZErr_lo = 0.2 # Not sure why this value
+          self.massZErr_hi = 7.2 # Not sure why this value
           self.GENZ_mean = 91.19
           self.GENZ_width = 2.44
 
+          self.selectors = {}
+          self.doLambda1 = doLambda1 
+#          if not self.doLambda1:
+#             self.pTLow_1st = doLambda1[1]['pTLow']
+#             self.pTHigh_1st = doLambda1[1]['pTHigh']
+#             self.etaLow_1st = doLambda1[1]['etaLow']
+#             self.etaHigh_1st = doLambda1[1]['etaHigh']
+             
+          ## pT cuts for bin1, both leps in bin1
+          if doLambda1:
+              self.pTLow_1st = binEdge['pTLow']
+              self.pTHigh_1st = binEdge['pTHigh']
+              self.etaLow_1st = binEdge['etaLow']
+              self.etaHigh_1st = binEdge['etaHigh']
+          ## I don't think the dictionary below follows the structure of the rest of the code
+          ## Therefore, commented out!
+          #else:
+          #    self.pTLow_1st = {'e': 7, 'mu': 40}
+          #    self.pTHigh_1st = {'e': 100, 'mu': 50}
+          #    self.etaLow_1st = {'e': 0, 'mu': 0}
+          #    self.etaHigh_1st = {'e': 1, 'mu': 0.9}
+
+          ## pT cuts for bin2
           self.pTLow = binEdge['pTLow']
           self.pTHigh = binEdge['pTHigh']
           self.etaLow = binEdge['etaLow']
           self.etaHigh = binEdge['etaHigh']
 
+          ## Lambdas is a dictionary of the original lambdas and then some
+          self.Lambdas = lambdas
           self.Lambdas = {'lambda1': lambdas['lambda1'],
                           'lambda2': lambdas['lambda2'],
                           'lambda': 1}
+          #self.Lambdas.update({'lambda': 1}) # this should work but I dont' want to test it yet
 
           self.fs = fs
           #cut to make dataset
           self.cut = " (massZ > "+str(self.massZ_lo)+" && massZ < "+str(self.massZ_hi)+") && "
-#          self.cut = " (massZ > 60 && massZ < 120) && "
           self.cut += " (massZErr > "+str(self.massZErr_lo)+" && massZErr < "+str(self.massZErr_hi)+") && "
-
+          ## Appends more cuts to lepton selection, like pT cuts and eta cuts
           self.doLambdaCut() # doLambda1Cut or doLambda2Cut
 
           #tree to get information
 #          self.fileName = "DYJetsToLL_M-50_m2" + self.fs + ".root"
-          self.fileName = "DYJetsToLL_M-50_kalman_v4_m2" + self.fs + ".root"
+          self.fileName = "DYJetsToLL_M-50_kalman_v4_m2" + self.fs + "_v2.root"
           if isData:
              self.fileName = "DoubleLepton_m2" + self.fs + ".root"
-
 #          self.treeFile = TFile("../inputRootFiles/"+self.fileName)
 #          self.treeFile = TFile("/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"+self.fileName)
           self.treeFile = TFile(paths['input']+self.fileName)
-
           self.tree = self.treeFile.Get("passedEvents")
           print 'tree opened'
 
-          #save
+          # Save
           self.path = paths['output']
           self.name = (self.fileName.split('.'))[0]
-          self.name += "_Pt_" + str(self.pTLow)  + "_to_" + str(self.pTHigh) + "_Eta_" + str(self.etaLow) + "_to_" + str(self.etaHigh)
-          self.name += "_" + tag
+          if self.doLambda1:
+             self.name += "_Pt_" + str(self.pTLow_1st)  + "_to_" + str(self.pTHigh_1st) + "_Eta_" + str(self.etaLow_1st) + "_to_" + str(self.etaHigh_1st)
+          else:
+             self.name += "_Pt_" + str(self.pTLow)  + "_to_" + str(self.pTHigh) + "_Eta_" + str(self.etaLow) + "_to_" + str(self.etaHigh)
 
+          ## tag     = "doLambda1_getPara_" + fs
+          self.name += "_" + tag
           self.tag = tag
 
-          #initial shape parameters
+          # Initial shape parameters
+          ## shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
           self.shapePara = shapePara
           self.w = RooWorkspace("w","workspace")
 
@@ -96,17 +135,21 @@ class GetCorrection():
 #          massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
 #          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
 
+          ## At this point, full cuts are applied: mZ, pT1, pT2, eta1, eta2
           cut = self.cut
           self.tree.Draw(">>myList", cut, "entrylist")
           entryList = gDirectory.Get("myList")
-          self.tree.SetEntryList(entryList)
+          ## Not sure what the entryList is for yet...
+          ## I think it has something to do with PROOF and parallel processing
+          self.tree.SetEntryList(entryList) 
 
-          selector = TSelector.GetSelector("MySelector.C")
+          selector = TSelector.GetSelector("/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/MySelector.C")
 
           selector.SetRange_massZ(self.massZ_lo, self.massZ_hi)
           selector.SetRange_massZErr(self.massZErr_lo, self.massZErr_hi)
-          selector.SetLambda(int(self.doLambda1), self.Lambdas["lambda1"], self.Lambdas["lambda2"])
+          selector.SetLambda( int(self.doLambda1), self.Lambdas["lambda1"], self.Lambdas["lambda2"] )
 
+          ## This is the big boy: run the Process method
           self.tree.Process(selector)
 
           self.Data_Zlls = selector.Data_Zlls
@@ -126,7 +169,7 @@ class GetCorrection():
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
-          #Crystalball
+          # Crystal Ball
           mean = RooRealVar("mean","mean", 0, -1, 1)
           alpha = RooRealVar("alpha","alpha", 1, 0, 10)
           n = RooRealVar("n","n", 5, 0, 30)
@@ -274,6 +317,7 @@ class GetCorrection():
              latex.DrawLatex(0.75, 0.5, "tau = %.3f" %(self.w.var("tau").getVal()))
 
           ch.SaveAs(self.path + self.name + '.png')
+          ch.SaveAs(self.path + self.name + '.pdf')
 
       def MakeSmallTree(self):
 
@@ -324,13 +368,17 @@ class GetCorrection():
 
         
       def doLambdaCut(self):
-
+          """
+          PURPOSE: Apply pT and eta cuts to lep1 and lep2
+          """
+          ## Bin1
           lep1InBin1 = " (pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
           lep1InBin1 += " && (abs(eta1) > " + str(self.etaLow_1st) + " && abs(eta1) < " + str(self.etaHigh_1st) + ")"
 
           lep2InBin1 = " (pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
           lep2InBin1 += " && (abs(eta2) > " + str(self.etaLow_1st) + " && abs(eta2) < " + str(self.etaHigh_1st) + ")"
 
+          ## Bin2
           lep1InBin2 = " (pT1 > " + str(self.pTLow) + " && pT1 < " + str(self.pTHigh) + ")"
           lep1InBin2 += " && (abs(eta1) > " + str(self.etaLow) + " && abs(eta1) < " + str(self.etaHigh) + ")"
 
@@ -338,8 +386,10 @@ class GetCorrection():
           lep2InBin2 += " && (abs(eta2) > " + str(self.etaLow) + " && abs(eta2) < " + str(self.etaHigh) + ")"
 
           if self.doLambda1:
-             self.cut += lep1InBin1 + " && " + lep2InBin1
+             ## apply all cuts so far (mZ,pT1,pT2,eta1,eta2) assuming leps are in same bin
+             self.cut += lep1InBin1 + " && " + lep2InBin1 
           else:
+             ## Take leptons to be in different bins: lep1 in bin1, lep2 in bin2
              self.cut += "((" + lep1InBin1 + " && " + lep2InBin2 + ") || (" + lep2InBin1 + " && " + lep1InBin2 + "))"
 
     
@@ -347,30 +397,35 @@ class GetCorrection():
 
 #         self.MakeSmallTree()
          self.PrepareDataset()
-         print 'dataset made'
+         print 'dataset made for parameters'
          self.MakeModel_getPara()
-         print 'model made'
+         print 'model made for parameters'
 
 #         self.w.Print()
 
          self.DoFit_getPara()
-         print 'fit done'
+         print 'fit done for parameters'
          self.AfterFit_getPara()
-         print 'parameter got'
+         print 'acquired parameters'
          self.PlotFit()
-         print 'plot made'
- 
+         print 'plot made for parameters'
+         return 
          
       def DriverGetLambda(self):
 
 #         self.MakeSmallTree()
          self.PrepareDataset()
+         print 'dataset made for lambda'
          self.MakeModel_getLambda()
+         print 'model made for lambda'
 
 #         self.w.Print()
 
          self.DoFit_getLambda()
+         print 'fit done for lambda'
          self.AfterFit_getLambda()
+         print 'acquired lambda'
          self.PlotFit()
-
+         print 'plot made for lambda'
+         return
           
