@@ -31,19 +31,17 @@ def ParseOption():
     return args
 
 args=ParseOption()
-## 5 parameters passed in from doLambda1.sh
+## Flags passed in from doLambda1.sh
 pTLow    = args.ptLow
 pTHigh   = args.ptHigh
 etaLow   = args.etaLow
 etaHigh  = args.etaHigh
 fs       = args.fs
+isData  = args.isData
 #filename = args.filename
 
 binEdge = {'pTLow': pTLow, 'pTHigh':pTHigh, 'etaLow':etaLow, 'etaHigh':etaHigh}
-isData  = args.isData
 doLambda1 = True
-#____________________________________________________________________________________________________
-#
 lambdas = {'lambda1':1, 'lambda2':1} # starting values for all lambdas
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0} # starting values for all parameters
 
@@ -80,3 +78,5 @@ shapePara = getCorr_getPara.shapePara
 with open(pathto_shapeParameters + getCorr_getPara.name.replace('.','p') + '.py', 'w') as f:
 #with open('shapeParameters/' + getCorr_getPara.name.replace('.','p') + '.py', 'w') as f:
      f.write('shapePara = ' + str(shapePara) + ' \n')
+
+print "getLambda1_doPara COMPLETE\n\n"

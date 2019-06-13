@@ -33,14 +33,14 @@ class GetCorrection():
             isData    = bool
             fs        = 'e' or 'mu'
             doLambda1 = bool. 
-                        If True: 
-                            Use binEdge values, else use hardcoded binEdge values below.
-                            Apply pT and eta cuts to lep1 and lep2 assuming they are in SAME BIN.
-                            MySelector.C will use massZErr values originally in "massZErr" branch of skimmed NTuple.
-                        If False: 
-                            MySelector.C will calculate a new massZErr based off of varying the pT of each lep individually.
-                        doLambda==True: leptons in same bin!       lep1 and lep2 both in bin1 (eta_1st vals)
-                        doLambda==False:leptons in different bins! (lep1 in bin1 and lep2 in bin2) or (lep1 in bin2 and lep2 in bin1)
+                If True: 
+                    Use binEdge values, else use hardcoded binEdge values below.
+                    Apply pT and eta cuts to lep1 and lep2 assuming they are in SAME BIN.
+                    MySelector.C will use massZErr values originally in "massZErr" branch of skimmed NTuple.
+                    doLambda==True: leptons in same bin! lep1 and lep2 both in bin1 (eta_1st vals)
+                If False: 
+                    MySelector.C will calculate a new massZErr based off of varying the pT of each lep individually.
+                    doLambda==False: leptons in different bins! (lep1 in bin1 and lep2 in bin2) or (lep1 in bin2 and lep2 in bin1)
             lambdas   = {'lambda1':1, 'lambda2':1}
             shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
             paths     = {'input':<input_DIR_to_NTuple>, 'output':<output_DIR>}
@@ -56,13 +56,20 @@ class GetCorrection():
           self.GENZ_width = 2.44
 
           self.selectors = {}
+
           self.doLambda1 = doLambda1 
+          if not self.doLambda1:
+             # doLambda1 == False in getLambda2_doPara.py
+             # leptons in different bins!
+             self.pTLow_1st   = binEdge['pTLow']
+             self.pTHigh_1st  = binEdge['pTHigh']
+             self.etaLow_1st  = binEdge['etaLow']
+             self.etaHigh_1st = binEdge['etaHigh']
 #          if not self.doLambda1:
 #             self.pTLow_1st = doLambda1[1]['pTLow']
 #             self.pTHigh_1st = doLambda1[1]['pTHigh']
 #             self.etaLow_1st = doLambda1[1]['etaLow']
 #             self.etaHigh_1st = doLambda1[1]['etaHigh']
-             
           # pT cuts for bin1, both leps in bin1
           if doLambda1:
               self.pTLow_1st = binEdge['pTLow']

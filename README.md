@@ -7,6 +7,7 @@ step to run doCorrection
 Take lambda1 from output/plots and put in doAll.sh
 
 2, ./doAll.sh
+(looks almost identical to doLambda1.sh, except it has a --lambda1_pre flag)
 
 other directories:
 

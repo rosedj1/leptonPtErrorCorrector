@@ -146,7 +146,7 @@ Bool_t MySelector::Process(Long64_t entry)
              double dm2 = (lep1+lep2p).M() - (lep1+lep2).M();*/
 
              double new_massZErr = TMath::Sqrt(dm1*dm1+dm2*dm2);
-             rv_massZErr->setVal(new_massZErr);              
+             rv_massZErr->setVal(new_massZErr); // Update RooRealVar with a new massZErr val
          
 //             massZ_massZErr->Fill(*massZ, new_massZErr);
 

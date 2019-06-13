@@ -69,6 +69,7 @@ getCorr_getLambda.shapePara = tmpPara_.shapePara
 # The big boy. This keeps the old parameters, finds sigma and lambda.
 getCorr_getLambda.DriverGetLambda()
 
+print "getLambda1_doLambda COMPLETE\n\n"
 #import sys
 #import subprocess as sp
 #pwd = sp.check_output(['pwd']).strip('\n')
