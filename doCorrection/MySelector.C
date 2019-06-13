@@ -33,11 +33,14 @@ void MySelector::SetRange_massZ(double low, double high) { massZ_lo = low; massZ
 void MySelector::SetRange_massZErr(double low, double high) { massZErr_lo = low; massZErr_hi = high;}
 void MySelector::SetLambda(int doLambda1_, double lambda1_, double lambda2_) {
 
-     doLambda1 = doLambda1_; lambda1 = lambda1_; lambda2 = lambda2_;
+     doLambda1 = doLambda1_; 
+     lambda1 = lambda1_; 
+     lambda2 = lambda2_;
 
      }
 
 
+//____________________________________________________________________________________
 void MySelector::Begin(TTree * /*tree*/)
 {
    // The Begin() function is called at the start of the query.
@@ -46,11 +49,11 @@ void MySelector::Begin(TTree * /*tree*/)
 
    TString option = GetOption();
 
-   rv_weight = new RooRealVar("weight","weight", 0.00001, 100);
-   rv_massZ = new RooRealVar("massZ","massZ", massZ_lo, massZ_hi);
+   rv_weight   = new RooRealVar("weight","weight", 0.00001, 100);
+   rv_massZ    = new RooRealVar("massZ","massZ", massZ_lo, massZ_hi);
    rv_massZErr = new RooRealVar("massZErr","massZErr", massZErr_lo, massZErr_hi);
-   rastmp = new RooArgSet(*rv_massZ, *rv_massZErr, *rv_weight);
-   Data_Zlls = new RooDataSet("Zlls","Zlls", *rastmp);
+   rastmp      = new RooArgSet(*rv_massZ, *rv_massZErr, *rv_weight);
+   Data_Zlls   = new RooDataSet("Zlls","Zlls", *rastmp);
 
 //   massZ_massZErr = new TH2F("massZ_massZErr", "", 300, massZ_lo, massZ_hi, 100, massZErr_lo, massZErr_hi);
 
@@ -62,6 +65,7 @@ void MySelector::Begin(TTree * /*tree*/)
 
 }
 
+//____________________________________________________________________________________
 void MySelector::SlaveBegin(TTree * /*tree*/)
 {
    // The SlaveBegin() function is called after the Begin() function.
@@ -82,6 +86,7 @@ void MySelector::SlaveBegin(TTree * /*tree*/)
 */
 }
 
+//____________________________________________________________________________________
 Bool_t MySelector::Process(Long64_t entry)
 {
    // The Process() function is called for each entry in the tree (or possibly
@@ -108,11 +113,13 @@ Bool_t MySelector::Process(Long64_t entry)
    lambda2 = 1; 
 */
 
+   // I think rv stands for "return value"
    rv_massZ->setVal(*massZ);
    rv_weight->setVal(*weight);
   
    if (doLambda1 == 1) {
 
+      // massZErr is the branch in the tree 
       rv_massZErr->setVal(*massZErr);
 //      massZ_massZErr->Fill(*massZ, *massZErr);
 
@@ -120,16 +127,23 @@ Bool_t MySelector::Process(Long64_t entry)
 
              TLorentzVector lep1 = TLorentzVector(0,0,0,0);
              TLorentzVector lep2 = TLorentzVector(0,0,0,0);
+             TLorentzVector lep1p = TLorentzVector(0,0,0,0);
+             TLorentzVector lep2p = TLorentzVector(0,0,0,0);
+             
+             // initialize 4-vectors with NO pT-err applied
              lep1.SetPtEtaPhiM(*pT1,*eta1,*phi1,*m1);
              lep2.SetPtEtaPhiM(*pT2,*eta2,*phi2,*m2);
 
-             TLorentzVector lep1p = TLorentzVector(0,0,0,0);
-             TLorentzVector lep2p = TLorentzVector(0,0,0,0);
-             lep1p.SetPtEtaPhiM( (*pT1)+(*pterr1)*lambda1, *eta1, *phi1, *m1);
-             lep2p.SetPtEtaPhiM( (*pT2)+(*pterr2)*lambda2, *eta2, *phi2, *m2);
+             double nominalmZ = (lep1+lep2).M();
 
-             double dm1 = (lep1p+lep2).M()-(lep1+lep2).M();
-             double dm2 = (lep1+lep2p).M()-(lep1+lep2).M();
+             // initialize 4-vectors WITH pT-err applied
+             lep1p.SetPtEtaPhiM( (*pT1)+(*pterr1)*lambda1, *eta1, *phi1, *m1);// Initial lambdas are: lambda1=1  and lambda2=1
+             lep2p.SetPtEtaPhiM( (*pT2)+(*pterr2)*lambda2, *eta2, *phi2, *m2);// Initial lambdas are: lambda1=1  and lambda2=1
+
+             double dm1       = (lep1p+lep2).M() - nominalmZ; // dm1 tells us how much lep1pTerr affects the calculated mZ mass
+             double dm2       = (lep1+lep2p).M() - nominalmZ; // dm2 tells us how much lep2pTerr affects the calculated mZ mass
+             /*double dm1 = (lep1p+lep2).M() - (lep1+lep2).M();
+             double dm2 = (lep1+lep2p).M() - (lep1+lep2).M();*/
 
              double new_massZErr = TMath::Sqrt(dm1*dm1+dm2*dm2);
              rv_massZErr->setVal(new_massZErr);              
@@ -146,6 +160,7 @@ Bool_t MySelector::Process(Long64_t entry)
    return kTRUE;
 }
 
+//____________________________________________________________________________________
 void MySelector::SlaveTerminate()
 {
    // The SlaveTerminate() function is called after all entries or objects
@@ -154,6 +169,7 @@ void MySelector::SlaveTerminate()
 
 }
 
+//____________________________________________________________________________________
 void MySelector::Terminate()
 {
    // The Terminate() function is the last function to be called during

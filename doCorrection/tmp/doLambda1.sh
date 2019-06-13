@@ -27,5 +27,5 @@
 #time python getLambda1_doLambda.py --ptLow 7 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs mu &
 
 # Tracker electrons
-time python getLambda1_doPara.py --ptLow 7 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs e 
-time python getLambda1_doLambda.py --ptLow 7 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs e &
+#time python getLambda1_doPara.py --ptLow 7 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs e #--fileName ""
+time python getLambda1_doLambda.py --ptLow 7 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs e #--fileName "DYJetsToLL_M-50_kalman_v4_m2e_v2.root"
