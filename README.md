@@ -3,6 +3,8 @@
 step to run doCorrection
 
 1, ./doLambda1.sh 
+- This will run doLambda1_getPara.py and produce the first mll histo and the fit.
+- Then it will run doLambda1_getLambda.py, retain all params (except sigma), and refit, making another mll plot.
 
 Take lambda1 from output/plots and put in doAll.sh
 

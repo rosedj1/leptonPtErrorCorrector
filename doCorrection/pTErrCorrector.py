@@ -166,7 +166,8 @@ class GetCorrection():
           # This is the big boy: run the Process method
           # Goes event by event in the tree, 
           # grabs the massZ from the massZ branch and the weight from the weight branch
-          # if doLambda1==True: use the massZErr from the massZErr branch. Else: calculate a new one by varying pT of leps
+          # if doLambda1==True: use the massZErr from the massZErr branch. 
+          # Else: calculate a new one by varying pT of leps
           self.tree.Process(selector)
 
           self.Data_Zlls = selector.Data_Zlls # Store the values in a RooDataSet called Data_Zlls
@@ -242,29 +243,29 @@ class GetCorrection():
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
-          # so far identical to MakeModel_getPara
+#           so far identical to MakeModel_getPara
 
           # Crystal Ball
           print "Calling MakeModel_getLambda."
           print "Fixed parameters going into CB:"
           for key,val in self.shapePara.items():
               print key,":",val
-          lambda_ = RooRealVar("lambda","lambda", 1, 0.7, 1.3)     # Start at lambda = 1
-          mean = RooRealVar("mean","mean", self.shapePara["mean"]) # THIS IS WHERE THINGS ARE DIFFERENT
-          alpha = RooRealVar("alpha","alpha", self.shapePara["alpha"])
-          n = RooRealVar("n","n", self.shapePara["n"])
-          sigma = RooFormulaVar("sigma","@1*@0", RooArgList(lambda_,  massZErr))
-          CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
-          #alpha2 = RooRealVar("alpha2","alpha2", self.shapePara["alpha2"])
-          #n2 = RooRealVar("n2","n2", self.shapePara["n2"])
+          lambda_   = RooRealVar("lambda","lambda", 1, 0.1, 5.0)     # Start at lambda = 1
+          mean      = RooRealVar("mean","mean", self.shapePara["mean"]) # THIS IS WHERE THINGS ARE DIFFERENT
+          alpha     = RooRealVar("alpha","alpha", self.shapePara["alpha"])
+          n         = RooRealVar("n","n", self.shapePara["n"])
+          sigma     = RooFormulaVar("sigma","@1*@0", RooArgList(lambda_,  massZErr))
+          CB        = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
+#         alpha2 = RooRealVar("alpha2","alpha2", self.shapePara["alpha2"])
+#         n2 = RooRealVar("n2","n2", self.shapePara["n2"])
 #          sigma = RooFormulaVar("sigma","@1*(1+@2/@1*@0)", RooArgList(lambda_, massZ, massZErr))
-          #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
-          #GENZ shape convoluted with crystal ball
+#          CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
+#          GENZ shape convoluted with crystal ball
 #          rdh_genzm = RooDataHist("rdh_genzm","rdh_genzm", RooArgList(massZ), self.hgenzm)
 #          rhp_genzm = RooHistPdf("rhp_genzm","rhp_genzm", RooArgSet(massZ), rdh_genzm)
-          #CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
+#          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, rhp_genzm, CB)
 
-          CBxBW = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
+          CBxBW     = RooFFTConvPdf("CBxBW","CBxBW", massZ, BW, CB)
 
           # Exponential Background
           tau = RooRealVar("tau","tau", self.shapePara["tau"])
@@ -401,13 +402,13 @@ class GetCorrection():
           # "getLambda" is originally found in getLambda1_doLambda.py (which is "step 2")
           # Therefore, the plot only has its parameters printed after the getLambda1_doLambda.py step
           if "getLambda" in self.tag:
-             latex.DrawLatex(0.75, 0.8, "#alpha = %.3f" %(self.w.var("alpha").getVal()))
-             latex.DrawLatex(0.75, 0.75, "fsig = %.3f" %(self.w.var("fsig").getVal()))
-             latex.DrawLatex(0.75, 0.7, "n = %.3f" %(self.w.var("n").getVal()))
+             latex.DrawLatex(0.70, 0.8, "#alpha = %.3f" %(self.w.var("alpha").getVal()))
+             latex.DrawLatex(0.70, 0.75, "fsig = %.3f" %(self.w.var("fsig").getVal()))
+             latex.DrawLatex(0.70, 0.7, "n = %.3f" %(self.w.var("n").getVal()))
 #             latex.DrawLatex(0.75, 0.65, "pa1 = %.3f" %(self.w.var("pa1").getVal()))
 #             latex.DrawLatex(0.75, 0.6, "pa2 = %.3f" %(self.w.var("pa2").getVal()))
-             latex.DrawLatex(0.75, 0.55, "#sigma_{CB} = %.3f" %(self.w.function("sigma").getVal()))
-             latex.DrawLatex(0.75, 0.5, "#tau = %.3f" %(self.w.var("tau").getVal()))
+#             latex.DrawLatex(0.75, 0.55, "#sigma_{CB} = %.3f" %(self.w.function("sigma").getVal()))
+             latex.DrawLatex(0.70, 0.65, "#tau = %.3f" %(self.w.var("tau").getVal()))
 
           ch.SaveAs(self.outpath + self.name + '.png')
           ch.SaveAs(self.outpath + self.name + '.pdf')

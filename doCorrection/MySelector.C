@@ -116,11 +116,18 @@ Bool_t MySelector::Process(Long64_t entry)
    // I think rv stands for "return value"
    rv_massZ->setVal(*massZ);
    rv_weight->setVal(*weight);
-  
-   if (doLambda1 == 1) {
+   bool DEBUG  = true;
 
+   if (DEBUG == 1 && (entry%50000==0)) {
+      std::cout << "entry " << entry << ": massZ " << *massZ << "; weight " << *weight << endl;
+   }
+
+   if (doLambda1 == 1) {
       // massZErr is the branch in the tree 
       rv_massZErr->setVal(*massZErr);
+      if (DEBUG == 1 && (entry%50000==0)) {
+      std::cout << "entry " << entry << ": massZErr " << *massZErr << endl;
+      }
 //      massZ_massZErr->Fill(*massZ, *massZErr);
 
       } else {
@@ -147,11 +154,13 @@ Bool_t MySelector::Process(Long64_t entry)
 
              double new_massZErr = TMath::Sqrt(dm1*dm1+dm2*dm2);
              rv_massZErr->setVal(new_massZErr); // Update RooRealVar with a new massZErr val
+             if (DEBUG == 1 && (entry%50000==0)) {
+             std::cout << "entry " << entry << ": new_massZErr " << new_massZErr << endl;
          
 //             massZ_massZErr->Fill(*massZ, new_massZErr);
 
              }
-
+        }
 //   rv_massZ->setBins(40,"fft");
 //   rv_massZErr->setBins(40,"fft");
 

@@ -2,20 +2,10 @@ from leptonPtErrorCorrector.doCorrection.pTErrCorrector import GetCorrection
 from PyUtils.fileUtils import copyFile, makeDirs
 import argparse
 
-#____________________________________________________________________________________________________
+#_____________________________________________________________________________________
 ### User parameters
-pathto_shapeParameters  = '/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/'
-pathto_inputdir         = "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/"
-pathto_outputdir        = "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" #getLambda1/"
-inputfilename           = "DYJetsToLL_M-50_kalman_v4_m2e_v2.root"
-
 DEBUG = 1
-#____________________________________________________________________________________________________
-### AUTOMATIC STUFF
-## Make output dir
-makeDirs(pathto_outputdir)
-copyFile("/home/rosedj1/","index.php",pathto_outputdir)
-#____________________________________________________________________________________________________
+#_____________________________________________________________________________________
 ### MAIN
 def ParseOption():
 
@@ -27,18 +17,31 @@ def ParseOption():
     parser.add_argument('--isData', dest='isData', action="store_true", default=False)
     #parser.add_argument('--filename', dest='filename', type=str)
     parser.add_argument('--fs', dest='fs', type=str)
+    parser.add_argument('--shapeParaDir', dest='shapeParaDir', type=str)
+    parser.add_argument('--inputDir', dest='inputDir', type=str)
+    parser.add_argument('--outputDir', dest='outputDir', type=str)
+    parser.add_argument('--inputFileName', dest='inputFileName', type=str)
     args = parser.parse_args()
     return args
 
 args=ParseOption()
 ## Flags passed in from doLambda1.sh
-pTLow    = args.ptLow
-pTHigh   = args.ptHigh
-etaLow   = args.etaLow
-etaHigh  = args.etaHigh
-fs       = args.fs
-isData  = args.isData
-#filename = args.filename
+pTLow                   = args.ptLow
+pTHigh                  = args.ptHigh
+etaLow                  = args.etaLow
+etaHigh                 = args.etaHigh
+fs                      = args.fs
+isData                  = args.isData
+pathto_shapeParameters  = args.shapeParaDir
+pathto_inputdir         = args.inputDir
+pathto_outputdir        = args.outputDir #getLambda1/"
+inputfilename           = args.inputFileName
+#_____________________________________________________________________________________
+### AUTOMATIC STUFF
+## Make output dir
+makeDirs(pathto_outputdir)
+copyFile("/home/rosedj1/","index.php",pathto_outputdir)
+#_____________________________________________________________________________________
 
 binEdge = {'pTLow': pTLow, 'pTHigh':pTHigh, 'etaLow':etaLow, 'etaHigh':etaHigh}
 doLambda1 = True
@@ -61,14 +64,14 @@ tag = "doLambda1_getPara_" + fs
 # shapePara starts off with all zeros
 getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag) 
 if DEBUG:
-    print "Parameters of getCorr_getPara objects BEFORE fit:"
+    print "Parameters of getCorr_getPara object BEFORE fit:"
     for key,val in getCorr_getPara.__dict__.items():
         print key,":",val
 
 # then it goes through the grind, and the parameters get updated
 getCorr_getPara.DriverGetPara()
 if DEBUG:
-    print "Parameters of getCorr_getPara objects AFTER fit:"
+    print "Parameters of getCorr_getPara object AFTER fit:"
     for key,val in getCorr_getPara.__dict__.items():
         print key,":",val
 
@@ -79,4 +82,4 @@ with open(pathto_shapeParameters + getCorr_getPara.name.replace('.','p') + '.py'
 #with open('shapeParameters/' + getCorr_getPara.name.replace('.','p') + '.py', 'w') as f:
      f.write('shapePara = ' + str(shapePara) + ' \n')
 
-print "getLambda1_doPara COMPLETE\n\n"
+print "getLambda1_doPara.py COMPLETE\n\n"

@@ -7,7 +7,7 @@ import argparse
 ### User parameters
 pathto_shapeParameters  = '/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/'
 pathto_inputdir         = "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/"
-pathto_outputdir        = "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" #getLambda1/"
+pathto_outputdir        = "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" 
 inputfilename           = "DYJetsToLL_M-50_kalman_v4_m2e_v2.root"
 
 DEBUG = 1
@@ -28,6 +28,7 @@ def ParseOption():
     parser.add_argument('--lambda1_pre', dest='lambda1_pre', type=float)
     parser.add_argument('--isData', dest='isData', action="store_true", default=False)
     parser.add_argument('--fs', dest='fs', type=str)
+    # "store_true" means that if this flag is specified, it will automatically be stored as True
     parser.add_argument('--doDebugPara', dest='doDEBUG_para', action="store_true",default=False)
     args = parser.parse_args()
     return args
@@ -50,8 +51,9 @@ shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 #shapePara = {"mean":0, "alpha":0, "n":0, "alpha2":0, "n2":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 
 path = {}
-path['input']  = pathto_inputdir
-path['output'] = pathto_outputdir
+path['input']    = pathto_inputdir
+path['output']   = pathto_outputdir
+path['filename'] = inputfilename
 #path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"
 #path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/"
 #path['output'] = "/home/mhl/public_html/2016/20161125_mass/test/"
@@ -68,7 +70,7 @@ if args.doDEBUG_para:
 
 shapePara = getCorr_getPara.shapePara
 
-with open('shapeParameters/' + getCorr_getPara.name.replace('.','p') + '.py', 'w') as f:
+with open(pathto_shapeParameters + getCorr_getPara.name.replace('.','p') + '.py', 'w') as f:
      f.write('shapePara = ' + str(shapePara) + ' \n')
 
 print "getLambda2_doPara COMPLETE\n\n"
