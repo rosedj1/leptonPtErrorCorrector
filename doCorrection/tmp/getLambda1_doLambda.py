@@ -3,22 +3,8 @@ from PyUtils.fileUtils import copyFile, makeDirs
 import argparse
 
 #____________________________________________________________________________________________________
-### User parameters
-pathto_shapeParameters  = '/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/'
-pathto_inputdir         = "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/"
-pathto_outputdir        = "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" #getLambda1/"
-inputfilename           = "DYJetsToLL_M-50_kalman_v4_m2e_v2.root"
-
-DEBUG = 1
-#____________________________________________________________________________________________________
 ### AUTOMATIC STUFF
-## Make output dir
-makeDirs(pathto_outputdir)
-copyFile("/home/rosedj1/","index.php",pathto_outputdir)
-#____________________________________________________________________________________________________
-### MAIN
 def ParseOption():
-
     parser = argparse.ArgumentParser(description='submit all')
     parser.add_argument('--ptLow', dest='ptLow', type=float)
     parser.add_argument('--ptHigh', dest='ptHigh', type=float)
@@ -31,13 +17,18 @@ def ParseOption():
     parser.add_argument('--inputDir', dest='inputDir', type=str)
     parser.add_argument('--outputDir', dest='outputDir', type=str)
     parser.add_argument('--inputFileName', dest='inputFileName', type=str)
+    parser.add_argument('--debug', dest='debug', type=bool)
     args = parser.parse_args()
     return args
-
+## Make output dir
+makeDirs(pathto_outputdir)
+makeDirs(shapeParaDir)
+copyFile("/home/rosedj1/","index.php",pathto_outputdir)
+#____________________________________________________________________________________________________
+### MAIN
 args=ParseOption()
 #sys.path.append('./shapeParameters')
-
-## 5 parameters passed in from doLambda1.sh
+## Flags passed in from doLambda1.sh
 pTLow                   = args.ptLow
 pTHigh                  = args.ptHigh
 etaLow                  = args.etaLow
@@ -48,6 +39,7 @@ pathto_shapeParameters  = args.shapeParaDir
 pathto_inputdir         = args.inputDir
 pathto_outputdir        = args.outputDir #getLambda1/"
 inputfilename           = args.inputFileName
+DEBUG                   = args.debug
 
 binEdge = {'pTLow': pTLow, 'pTHigh':pTHigh, 'etaLow':etaLow, 'etaHigh':etaHigh}
 doLambda1 = True
@@ -94,9 +86,3 @@ if DEBUG:
         print key,":",val
 
 print "getLambda1_doLambda COMPLETE\n\n"
-#import sys
-#import subprocess as sp
-#pwd = sp.check_output(['pwd']).strip('\n')
-#print "Executing script from dir:",pwd
-#sys.path.append(pwd)
-#from pTErrCorrector import GetCorrection

@@ -12,7 +12,7 @@
 
 #____________________________________________________________________________________________________
 # User Parameters
-import ROOT, sys, os, string, re
+import sys, os, string, re
 # Probably don't need import ROOT
 from ROOT import * 
 from array import array
@@ -157,15 +157,23 @@ class GetCorrection():
           # I think it has something to do with PROOF and parallel processing
           self.tree.SetEntryList(entryList) 
 
+          # Make and prepare selector object.
           selector = TSelector.GetSelector("/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/MySelector.C")
           # These variables are defined in MySelector.C 
           selector.SetRange_massZ(self.massZ_lo, self.massZ_hi) # hard-coded above as [60-120] GeV
           selector.SetRange_massZErr(self.massZErr_lo, self.massZErr_hi) # hard-coded above as [0.2-7.0] GeV
           selector.SetLambda( int(self.doLambda1), self.Lambdas["lambda1"], self.Lambdas["lambda2"] )
 
-          # This is the big boy: run the Process method
-          # Goes event by event in the tree, 
-          # grabs the massZ from the massZ branch and the weight from the weight branch
+# These variables are from MySelector.h. Putting them here for easy reference. 
+#   rv_weight   = new RooRealVar("weight","weight", 0.00001, 100);
+#   rv_massZ    = new RooRealVar("massZ","massZ", massZ_lo, massZ_hi);
+#   rv_massZErr = new RooRealVar("massZErr","massZErr", massZErr_lo, massZErr_hi);
+#   rastmp      = new RooArgSet(*rv_massZ, *rv_massZErr, *rv_weight);
+#   Data_Zlls   = new RooDataSet("Zlls","Zlls", *rastmp);
+
+          # This is the big boy: run the Process method.
+          # Go event by event in the tree and grab the massZ (from the massZ branch) 
+          # and the weight from the weight branch.
           # if doLambda1==True: use the massZErr from the massZErr branch. 
           # Else: calculate a new one by varying pT of leps
           self.tree.Process(selector)
@@ -175,6 +183,7 @@ class GetCorrection():
           self.Data_Zlls_w = RooDataSet(self.Data_Zlls.GetName(), self.Data_Zlls.GetTitle(), self.Data_Zlls, self.Data_Zlls.get(), "1", "weight")
           print "original RooDataSet has " + str(self.Data_Zlls.numEntries()) + " events"
           print "copied RooDataSet has " + str(self.Data_Zlls_w.numEntries()) + " events"
+          print "The cuts used are:\n", self.cut
           self.Data_Zlls_binned = self.Data_Zlls_w.binnedClone()
 
 #____________________________________________________________________________________________________
@@ -183,23 +192,23 @@ class GetCorrection():
           Creates the different PDFs (BW, CB) and then creates the model (convolution of CBxBW, exp bkg, and fsig).
           """
           # Variables
-          massZ = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
-          massZErr = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
+          massZ             = RooRealVar("massZ","massZ", self.massZ_lo, self.massZ_hi)
+          massZErr          = RooRealVar("massZErr","massZErr", self.massZErr_lo, self.massZErr_hi)
 
           # BreitWigner
-          breitWignerMean = RooRealVar("breitWignerMean", "m_{Z^{0}}", self.GENZ_mean)
-          breitWignerGamma = RooRealVar("breitWignerGamma", "#Gamma", self.GENZ_width)
+          breitWignerMean   = RooRealVar("breitWignerMean", "m_{Z^{0}}", self.GENZ_mean)
+          breitWignerGamma  = RooRealVar("breitWignerGamma", "#Gamma", self.GENZ_width)
           breitWignerGamma.setConstant(kTRUE)
           breitWignerMean.setConstant(kTRUE)
           BW = RooBreitWigner("BW","Breit Wigner theory", massZ, breitWignerMean,breitWignerGamma)
 
           # Crystal Ball
           mean  = RooRealVar("mean","mean", 0, -1, 1)
+          sigma = RooRealVar("sigma", "sigma", 1, 0, 15)
           alpha = RooRealVar("alpha","alpha", 1, 0, 10)
           n     = RooRealVar("n","n", 5, 0, 30)
           #alpha2 = RooRealVar("alpha2","alpha2", 1.2, 0, 50)
           #n2 = RooRealVar("n2","n2", 15, 0.1, 50)
-          sigma = RooRealVar("sigma", "sigma", 1, 0, 10)
           CB = RooCBShape("CB","CB", massZ, mean, sigma, alpha, n)
           #CB = RooDoubleCB("CB","CB", massZ, mean, sigma, alpha, n, alpha2, n2)
           
@@ -246,7 +255,7 @@ class GetCorrection():
 #           so far identical to MakeModel_getPara
 
           # Crystal Ball
-          print "Calling MakeModel_getLambda."
+          print "\nCalling MakeModel_getLambda."
           print "Fixed parameters going into CB:"
           for key,val in self.shapePara.items():
               print key,":",val
@@ -280,6 +289,7 @@ class GetCorrection():
 
           model = RooAddPdf("model","model", CBxBW, bkg, fsig)
           
+          # I think this is making "model" a global variable...
           getattr(self.w,'import')(model)
 
 #____________________________________________________________________________________________________
@@ -362,16 +372,20 @@ class GetCorrection():
 #____________________________________________________________________________________________________
       def PlotFit(self):
 
+          # Make a plotting frame (essentially a canvas).
           PmassZ = self.w.var("massZ").frame(RooFit.Bins(100))
-          PmassZ.GetXaxis().SetTitle("massZ(GeV)")
+          PmassZ.GetXaxis().SetTitle("m_{\\ell\\ell}\\ [GeV]")
           PmassZ.GetYaxis().SetTitleOffset(1.3)
 
+          # This adds the data to the plot.
           self.Data_Zlls_w.plotOn(PmassZ)
+
           self.w.pdf("model").plotOn(PmassZ, 
                                      RooFit.ProjWData(self.Data_Zlls_w, kTRUE),
                                      RooFit.LineColor(2), 
                                      RooFit.LineWidth(1) 
                                      )
+          # Adds a box with parameters values to the frame.
           self.w.pdf("model").paramOn(PmassZ, 
                                       RooFit.Layout(0.17, 0.47, 0.9), 
                                       RooFit.Format("NE", RooFit.FixedPrecision(4))
@@ -382,10 +396,18 @@ class GetCorrection():
           # Also return a list of floating parameters after fit
           chi2 = PmassZ.chiSquare(self.rFit.floatParsFinal().getSize())
           dof =  self.rFit.floatParsFinal().getSize()
-          self.w.pdf("model").plotOn(PmassZ, RooFit.Components("bkg"), RooFit.LineStyle(kDashed))
+
+          # Draw the bkg function and 
+          self.w.pdf("model").plotOn(PmassZ, 
+                                     RooFit.Components("bkg"), 
+                                     RooFit.LineStyle(kDashed)
+                                     )
           self.Data_Zlls_w.plotOn(PmassZ)
-          self.w.pdf("model").plotOn(PmassZ, RooFit.ProjWData(self.Data_Zlls_w,kTRUE),\
-                                      RooFit.LineColor(2), RooFit.LineWidth(1) )
+          self.w.pdf("model").plotOn(PmassZ, 
+                                     RooFit.ProjWData(self.Data_Zlls_w,kTRUE),
+                                     RooFit.LineColor(2), 
+                                     RooFit.LineWidth(1) 
+                                     )
 
           ch = TCanvas("ch","ch",1000,800)
           ch.cd()
@@ -397,7 +419,9 @@ class GetCorrection():
           latex.SetTextSize(0.55*ch.GetTopMargin())
           latex.SetTextFont(42)
           latex.SetTextAlign(11)
-          latex.DrawLatex(0.75, 0.85, "#chi^{2}/DOF = %.3f" %(chi2/dof))
+
+          # DrawLatex(xcoord, ycoord, "text")
+          latex.DrawLatex(0.70, 0.85, "#chi^{2}/DOF = %.3f" %(chi2/dof))
 
           # "getLambda" is originally found in getLambda1_doLambda.py (which is "step 2")
           # Therefore, the plot only has its parameters printed after the getLambda1_doLambda.py step
@@ -413,6 +437,9 @@ class GetCorrection():
           ch.SaveAs(self.outpath + self.name + '.png')
           ch.SaveAs(self.outpath + self.name + '.pdf')
 
+          return PmassZ, chi2, dof, ch, latex
+
+#___________________________________________________________________________
       def MakeSmallTree(self):
 
           f = TFile(self.path+self.name+".root","recreate")
@@ -512,9 +539,9 @@ class GetCorrection():
          print 'acquired new parameters from fit\n'
 
          # Make the plot
-         self.PlotFit()
+         PmassZ, chi2, dof, ch, latex = self.PlotFit()
          print 'plot successfully made for parameters\n'
-         return 
+         return PmassZ, chi2, dof, ch, latex 
          
 #____________________________________________________________________________________________________
       def DriverGetLambda(self):
@@ -541,7 +568,7 @@ class GetCorrection():
          print 'acquired lambda\n'
 
          # Make the plot
-         self.PlotFit()
+         PmassZ, chi2, dof, ch, latex = self.PlotFit()
          print 'plot successfully made for lambda\n'
-         return
+         return PmassZ, chi2, dof, ch, latex
           

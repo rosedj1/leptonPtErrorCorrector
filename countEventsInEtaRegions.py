@@ -1,5 +1,4 @@
-#!/bin/bash
-#####################################################################################################
+############################################################################
 ## PURPOSE: Count the number of events in each relative pT error vs. eta region for muons,
 ##          tracker electrons, and ECAL electrons in a skimmed NTuple. 
 ## SYNTAX:  python <script.py> <inputfile.root> <finalstate>
@@ -7,31 +6,31 @@
 ##          - <finalstate> must either be "2e" or "2mu"
 ## AUTHOR:  Jake Rosenzweig
 ## DATE:    2019-06-21
-## UPDATED: 
-#####################################################################################################
+## UPDATED: 2019-07-07
+############################################################################
 import ROOT
 import sys
-#____________________________________________________________________________________________________
-# User Parameters
-#___________________________________________________________________________
-# Functions
-def countEventsWithCuts(tree, title, cuts, text):
-    n_events = tree.GetEntries(cuts)
-    print title, "\t"+text, n_events, "entries"
-    return n_events
 #___________________________________________________________________________
 # Automatic Stuff
 inputfile = str(sys.argv[1])
 fs        = str(sys.argv[2])
 f = ROOT.TFile.Open(inputfile)
 t = f.Get("passedEvents")
+ntot = t.GetEntries()
 
 if fs not in ["2e","2mu"]:
-    print 'ERROR: You must pass either "2e" or "2mu"'
+    print 'ERROR: You must pass in either "2e" or "2mu"'
+#___________________________________________________________________________
+# Functions
+def countEventsWithCuts(tree, title, cuts, text):
+    n_events = tree.GetEntries(cuts)
+    print "%s\t%s: %d events...\t%.4E%% of total events" % (title,text,n_events,n_events*100./ntot)
+    return n_events
     sys.exit()
 #___________________________________________________________________________
 # MAIN
-print "\nTotal entries in NTuple:", t.GetEntries(),"\n" 
+print "\nTotal events in NTuple:", ntot
+print "...finding how many pairs of each lepton belong to same eta region...\n"
 
 #############
 # ELECTRONS #

@@ -26,14 +26,7 @@
 #time python getLambda1_doPara.py --ptLow 7 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs mu 
 #time python getLambda1_doLambda.py --ptLow 7 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs mu &
 
+#time python getLambda1_doBoth.py --ptLow 7 --ptHigh 100 --etaLow 0.9 --etaHigh 1.8 --fs mu --debug 0 --getPara 1 --getLambda 0 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" --inputDir "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/" --inputFileName "DYJetsToLL_M-50_kalman_v4_m2mu_v2.root" 
+time ipython -i getLambda1_doBoth.py -- --ptLow 7 --ptHigh 100 --etaLow 0.9 --etaHigh 1.8 --fs mu --debug 0 --getPara 0 --getLambda 1 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" --inputDir "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/" --inputFileName "DYJetsToLL_M-50_kalman_v4_m2mu_v2.root" 
+
 # Tracker electrons
-
-
-#time python getLambda1_doPara.py --ptLow 10 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs e \
-#    --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/" \
-#    --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" \
-#    --inputDir "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/" \
-#    --inputFileName "DYJetsToLL_M-50_kalman_v4_m2e_v2.root" 
-
-#--fileName "DYJetsToLL_M-50_kalman_v4_m2e_v2.root"
-time python getLambda1_doLambda.py --ptLow 7 --ptHigh 100 --etaLow 0.0 --etaHigh 0.9 --fs e --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" --inputDir "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/" --inputFileName "DYJetsToLL_M-50_kalman_v4_m2e_v2.root" 
