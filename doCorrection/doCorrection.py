@@ -24,7 +24,7 @@ def ParseOption():
     args = parser.parse_args()
     return args
 
-args=ParseOption()
+args=ParseOption() # args is a ParseOption object
 sys.path.append('./shapeParameters')
 
 pTLow = args.ptLow
