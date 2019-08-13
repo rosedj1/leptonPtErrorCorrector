@@ -107,22 +107,22 @@ if fs == "2e":
     print "Counting pairs of electrons:"
     #___________________________________________________________________________
     # ECAL electrons
-    #n_ecal_reg1a, perc_ecal_reg1a = countEventsWithCuts( t, "ECAL_region_1a:", ECAL_reg_1a_cuts, "[0, 0.8]\trel_pTErr < 3%:")
-    #n_ecal_reg1b, perc_ecal_reg1b = countEventsWithCuts( t, "ECAL_region_1b:", ECAL_reg_1b_cuts, "[0.8, 1.0]\trel_pTErr < 3%:")
-    #print
+    n_ecal_reg1a, perc_ecal_reg1a = countEventsWithCuts( t, "ECAL_region_1a:", ECAL_reg_1a_cuts, "[0, 0.8]\trel_pTErr < 3%:")
+    n_ecal_reg1b, perc_ecal_reg1b = countEventsWithCuts( t, "ECAL_region_1b:", ECAL_reg_1b_cuts, "[0.8, 1.0]\trel_pTErr < 3%:")
+    print
 
     n_ecal_reg2, perc_ecal_reg2 = countEventsWithCuts( t, "ECAL_region_2:", ECAL_reg_2_cuts, "[0, 1.0]\trel_pTErr > 3%:")
-    #print
+    print
 
-    #n_ecal_reg3a, perc_ecal_reg3a = countEventsWithCuts( t, "ECAL_region_3a:", ECAL_reg_3a_cuts, "[1.0, 1.2]\trel_pTErr < 7%:")
-    #n_ecal_reg3b, perc_ecal_reg3b = countEventsWithCuts( t, "ECAL_region_3b:", ECAL_reg_3b_cuts, "[1.2, 1.44]\trel_pTErr < 7%:")
-    #n_ecal_reg3c, perc_ecal_reg3c = countEventsWithCuts( t, "ECAL_region_3c:", ECAL_reg_3c_cuts, "[1.44, 1.57]\trel_pTErr < 7%:")
-    #n_ecal_reg3d, perc_ecal_reg3d = countEventsWithCuts( t, "ECAL_region_3d:", ECAL_reg_3d_cuts, "[1.57, 2.0]\trel_pTErr < 7%:")
-    #n_ecal_reg3e, perc_ecal_reg3e = countEventsWithCuts( t, "ECAL_region_3e:", ECAL_reg_3e_cuts, "[2.0, 2.5]\trel_pTErr < 7%:")
-    #print
+    n_ecal_reg3a, perc_ecal_reg3a = countEventsWithCuts( t, "ECAL_region_3a:", ECAL_reg_3a_cuts, "[1.0, 1.2]\trel_pTErr < 7%:")
+    n_ecal_reg3b, perc_ecal_reg3b = countEventsWithCuts( t, "ECAL_region_3b:", ECAL_reg_3b_cuts, "[1.2, 1.44]\trel_pTErr < 7%:")
+    n_ecal_reg3c, perc_ecal_reg3c = countEventsWithCuts( t, "ECAL_region_3c:", ECAL_reg_3c_cuts, "[1.44, 1.57]\trel_pTErr < 7%:")
+    n_ecal_reg3d, perc_ecal_reg3d = countEventsWithCuts( t, "ECAL_region_3d:", ECAL_reg_3d_cuts, "[1.57, 2.0]\trel_pTErr < 7%:")
+    n_ecal_reg3e, perc_ecal_reg3e = countEventsWithCuts( t, "ECAL_region_3e:", ECAL_reg_3e_cuts, "[2.0, 2.5]\trel_pTErr < 7%:")
+    print
 
     n_ecal_reg4, perc_ecal_reg4 = countEventsWithCuts( t, "ECAL_region_4:", ECAL_reg_4_cuts, "[1.0, 1.2]\trel_pTErr > 7%:")
-    #print
+    print
 
     ##___________________________________________________________________________
     ## TRACKER electrons
@@ -142,11 +142,11 @@ if fs == "2e":
         """
         if old_perc <= lim_stats_percentage: 
             print "WARNING! Limited statistics found in region: %s" % new_region
-            print "(percentage of events in this region is < %f)" % lim_stats_percentage
+            print "(percentage of events in this region is < %.3f)" % lim_stats_percentage
             print "Using limited statistics procedure to increase statistics..."
             
             n_events, new_perc = countEventsWithCuts(t,new_region,cuts,text)
-            print "Old region percentage of total events compared to new region: %.6f\tvs.\t%.6f" % (old_perc,new_perc)
+            print "Old region percentage of total events compared to new region percentage: %.6f\tvs.\t%.6f" % (old_perc,new_perc)
             print "%s has %.3f more events than %s\n" % (new_region, float(n_events)/old_nevents, old_region)
 
             return n_events, new_perc
