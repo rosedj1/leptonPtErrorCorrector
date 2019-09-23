@@ -146,7 +146,7 @@ if fs == "2e":
             print "Using limited statistics procedure to increase statistics..."
             
             n_events, new_perc = countEventsWithCuts(t,new_region,cuts,text)
-            print "Old region percentage of total events compared to new region percentage: %.6f\tvs.\t%.6f" % (old_perc,new_perc)
+            print "Old region percentage of total events compared to new region percentage:\t%.6f\tvs.\t%.6f" % (old_perc,new_perc)
             print "%s has %.3f more events than %s\n" % (new_region, float(n_events)/old_nevents, old_region)
 
             return n_events, new_perc

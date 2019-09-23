@@ -23,10 +23,46 @@ RooMsgService.instance().setStreamStatus(1,False);
 setTDRStyle()
 
 gROOT.SetBatch(kTRUE)   # kTRUE will NOT draw plots to screen
+# Possible strings for e_regions (NEWNAME):
+## OLDNAME           NEWNAME                   ETABIN          RELPTERR      
+## ECAL_region_1a:   ECAL_barrel_pterrlow_a    [0, 0.8]        rel_pTErr < 3%
+## ECAL_region_1b:   ECAL_barrel_pterrlow_b    [0.8, 1.0]      rel_pTErr < 3%
+##                                                                           
+## ECAL_region_2:    ECAL_barrel_pterrhigh     [0, 1.0]        rel_pTErr > 3%
+##                                                                           
+## ECAL_region_3a:   ECAL_endcap_pterrlow_a    [1.0, 1.2]      rel_pTErr < 7%
+## ECAL_region_3b:   ECAL_endcap_pterrlow_b    [1.2, 1.44]     rel_pTErr < 7%
+## ECAL_region_3c:   ECAL_endcap_pterrlow_c    [1.44, 1.57]    rel_pTErr < 7%
+## ECAL_region_3d:   ECAL_endcap_pterrlow_d    [1.57, 2.0]     rel_pTErr < 7%
+## ECAL_region_3e:   ECAL_endcap_pterrlow_e    [2.0, 2.5]      rel_pTErr < 7%
+##                                                                           
+## ECAL_region_4:    ECAL_endcap_pterrhigh     [1.0, 1.2]      rel_pTErr > 7%
+##                                                                           
+## Tracker_region_1  Tracker_barrel            [0, 1.44]                                  
+## Tracker_region_2  Tracker_endcap_a          [1.44, 1.6]                                
+## Tracker_region_3  Tracker_endcap_b          [1.6, 2.0]                                 
+## Tracker_region_4  Tracker_endcap_c          [2.0, 2.5]                                 
+
+e_region_dict = {
+    'ECAL_barrel_pterrlow_a': {'eta_min':0.0,  'eta_max':0.8,  'rel_pTErr':'< 0.03'},
+    'ECAL_barrel_pterrlow_b': {'eta_min':0.8,  'eta_max':1.0,  'rel_pTErr':'< 0.03'},
+    'ECAL_barrel_pterrhigh' : {'eta_min':0.0,  'eta_max':1.0,  'rel_pTErr':'> 0.03'},
+    'ECAL_endcap_pterrlow_a': {'eta_min':1.0,  'eta_max':1.2,  'rel_pTErr':'< 0.07'},
+    'ECAL_endcap_pterrlow_b': {'eta_min':1.2,  'eta_max':1.44, 'rel_pTErr':'< 0.07'},
+    'ECAL_endcap_pterrlow_c': {'eta_min':1.44, 'eta_max':1.57, 'rel_pTErr':'< 0.07'},
+    'ECAL_endcap_pterrlow_d': {'eta_min':1.57, 'eta_max':2.0,  'rel_pTErr':'< 0.07'},
+    'ECAL_endcap_pterrlow_e': {'eta_min':2.0,  'eta_max':2.5,  'rel_pTErr':'< 0.07'},
+    'ECAL_endcap_pterrhigh' : {'eta_min':1.0,  'eta_max':1.2,  'rel_pTErr':'> 0.07'},
+    'Tracker_barrel'        : {'eta_min':0.0,  'eta_max':1.44, 'rel_pTErr':'> -1.0'},
+    'Tracker_endcap_a'      : {'eta_min':1.44, 'eta_max':1.6,  'rel_pTErr':'> -1.0'},
+    'Tracker_endcap_b'      : {'eta_min':1.6,  'eta_max':2.0,  'rel_pTErr':'> -1.0'},
+    'Tracker_endcap_c'      : {'eta_min':2.0,  'eta_max':2.5,  'rel_pTErr':'> -1.0'},
+}
 
 class GetCorrection():
 
-      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
+      #def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
+      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag, e_region=''):
           """
           ARGUMENTS:
             binEdge   =  {pTLow:<> ,pTHigh:<>, etaLow:<>, etaHigh:<>}
@@ -374,7 +410,8 @@ class GetCorrection():
 
           # Make a plotting frame (essentially a canvas).
           PmassZ = self.w.var("massZ").frame(RooFit.Bins(100))
-          PmassZ.GetXaxis().SetTitle("m_{\\ell\\ell}\\ [GeV]")
+          PmassZ.GetXaxis().SetTitle("this is a test [GeV]")
+#          PmassZ.GetXaxis().SetTitle("m_{\\ell\\ell}\\ [GeV]")
           PmassZ.GetYaxis().SetTitleOffset(1.3)
 
           # This adds the data to the plot.
@@ -507,6 +544,27 @@ class GetCorrection():
 
           lep2InBin2 = " (pT2 > " + str(self.pTLow) + " && pT2 < " + str(self.pTHigh) + ")"
           lep2InBin2 += " && (abs(eta2) > " + str(self.etaLow) + " && abs(eta2) < " + str(self.etaHigh) + ")"
+
+#          if self.fs == "e":
+#              self.cut += self.relpTerr_cut
+
+          # User selects electron region and correct parameters are grabbed via e_region_dict. 
+          if self.fs == 'e': 
+              lep1InBin1 += " (lep1_ecalDriven && pterr1/pT1 " + e_region_dict[e_region]['rel_pTErr'] 
+              lep1InBin1 += " && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+              #lep1InBin1 += " (lep1_ecalDriven && pterr1/pT1 < 0.07 && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+              
+              lep2InBin1 += " (lep2_ecalDriven && pterr2/pT2 " + e_region_dict[e_region]['rel_pTErr'] 
+              lep2InBin1 += " && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+              #lep2InBin1 = " (lep2_ecalDriven && pterr2/pT2 < 0.07 && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+              
+              lep1InBin2 += " (lep1_ecalDriven && pterr1/pT1 " + e_region_dict[e_region]['rel_pTErr'] 
+              lep1InBin2 += " && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+              #lep1InBin2 += " && (abs(eta1) > " + str(self.etaLow_1st) + " && abs(eta1) < " + str(self.etaHigh_1st) + ")"
+              
+              lep2InBin2 += " (lep2_ecalDriven && pterr2/pT2 " + e_region_dict[e_region]['rel_pTErr'] 
+              lep2InBin2 += " && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+              #lep2InBin2 += " && (abs(eta2) > " + str(self.etaLow_1st) + " && abs(eta2) < " + str(self.etaHigh_1st) + ")"
 
           if self.doLambda1:
              # apply all cuts so far (mZ,pT1,pT2,eta1,eta2) assuming leps are in same bin
