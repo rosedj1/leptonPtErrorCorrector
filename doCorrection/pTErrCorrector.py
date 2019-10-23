@@ -168,6 +168,7 @@ class GetCorrection():
           self.tree.SetEntryList(entryList) 
 
           # Make and prepare selector object.
+          print "About to get Selector...\n"
           selector = TSelector.GetSelector("/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/MySelector.C")
           # These variables are defined in MySelector.C 
           selector.SetRange_massZ(self.massZ_lo, self.massZ_hi) # hard-coded above as [60-120] GeV

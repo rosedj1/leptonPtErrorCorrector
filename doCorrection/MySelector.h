@@ -72,10 +72,13 @@ public :
    double massZ_lo, massZ_hi;
    double massZErr_lo, massZErr_hi;
 
+   //MySelector() {}
+   //MySelector(int i=3);
    MySelector(TTree * /*tree*/ =0):
      rv_weight(0), rv_massZ(0), rv_massZErr(0), rastmp(0), Data_Zlls(0) {}
 
    virtual ~MySelector() {}
+   //virtual ~MySelector();
    virtual Int_t   Version() const { return 2; }
    virtual void    Begin(TTree *tree);
    virtual void    SlaveBegin(TTree *tree);
@@ -94,7 +97,7 @@ public :
    void SetRange_massZErr(double low, double high);
    void SetLambda(int doLambda1_, double lambda1_, double lambda2_);
 
-   ClassDef(MySelector,1);
+   ClassDef(MySelector,0); //ClassDef Title which Jake made
 
 };
 
