@@ -1,0 +1,7 @@
+
+Total events in NTuple: 4287774
+Counting pairs of muons:
+Muon_region_1:	[0, 0.9]:		861880	events, which is	20.100873%	of total events
+Muon_region_2:	[0.9, 1.8]:		577552	events, which is	13.469740%	of total events
+Muon_region_3:	[1.8, 2.4]:		173111	events, which is	4.037316%	of total events
+

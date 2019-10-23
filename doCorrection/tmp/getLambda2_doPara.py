@@ -5,8 +5,10 @@ import argparse
 
 #____________________________________________________________________________________________________
 ### User parameters
-pathto_shapeParameters  = '/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/'
-pathto_inputdir         = "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/"
+pathto_shapeParameters  = '/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/'
+#pathto_shapeParameters  = '/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/'
+pathto_inputdir         = "/raid/raid8/ferrico/Useful_Code_HZZ/CMSSW_10_2_15/src/makeSlimTree/"
+#pathto_inputdir         = "/raid/raid8/ferrico/HZZ4l/CMSSW_10_2_5/src/leptonPtErrorCorrector/makeSlimTree/output/DY_2018/"
 pathto_outputdir        = "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/" 
 inputfilename           = "DYJetsToLL_M-50_kalman_v4_m2e_v2.root"
 
@@ -47,6 +49,7 @@ isData = args.isData
 binEdge = {'pTLow': pTLow, 'pTHigh':pTHigh, 'etaLow':etaLow, 'etaHigh':etaHigh}
 doLambda1 = False
 lambdas = {'lambda1':lambda1_pre, 'lambda2':1}
+# These shapePara keys are different from the ones in getLambda1_doPara.py
 shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 #shapePara = {"mean":0, "alpha":0, "n":0, "alpha2":0, "n2":0, "tau":0, "pa1":0, "pa2":0, "fsig":0}
 

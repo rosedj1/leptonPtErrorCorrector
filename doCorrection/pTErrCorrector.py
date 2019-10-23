@@ -26,7 +26,8 @@ gROOT.SetBatch(kTRUE)   # kTRUE will NOT draw plots to screen
 
 class GetCorrection():
 
-      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
+      #def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
+      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag, e_region_dict):
           """
           ARGUMENTS:
             binEdge   =  {pTLow:<> ,pTHigh:<>, etaLow:<>, etaHigh:<>}
@@ -45,6 +46,7 @@ class GetCorrection():
             shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
             paths     = {'input':<input_DIR_to_NTuple>, 'output':<output_DIR>}
             tag       = "doLambda1_getPara_" + fs
+            e_region  = A dictionary to specify the kinematic regions of different electron regions.
           """
 
           # Hard-coded parameters
@@ -56,15 +58,18 @@ class GetCorrection():
           self.GENZ_width = 2.44
 
           self.selectors = {}
+          self.e_region_dict = e_region_dict
 
           self.doLambda1 = doLambda1 
           if not self.doLambda1:
              # doLambda1 == False in getLambda2_doPara.py
              # leptons in different bins!
-             self.pTLow_1st   = binEdge['pTLow']
-             self.pTHigh_1st  = binEdge['pTHigh']
-             self.etaLow_1st  = binEdge['etaLow']
-             self.etaHigh_1st = binEdge['etaHigh']
+              self.pTLow_1st   = binEdge['pTLow']
+              self.pTHigh_1st  = binEdge['pTHigh']
+              self.etaLow_1st  = e_region_dict['eta_min']
+              self.etaHigh_1st = e_region_dict['eta_max']             
+#             self.etaLow_1st  = binEdge['etaLow']
+#             self.etaHigh_1st = binEdge['etaHigh']
 #          if not self.doLambda1:
 #             self.pTLow_1st = doLambda1[1]['pTLow']
 #             self.pTHigh_1st = doLambda1[1]['pTHigh']
@@ -74,8 +79,11 @@ class GetCorrection():
           if doLambda1:
               self.pTLow_1st = binEdge['pTLow']
               self.pTHigh_1st = binEdge['pTHigh']
-              self.etaLow_1st = binEdge['etaLow']
-              self.etaHigh_1st = binEdge['etaHigh']
+              self.etaLow_1st  = e_region_dict['eta_min']
+              self.etaHigh_1st = e_region_dict['eta_max']             
+#              self.etaLow_1st = binEdge['etaLow']
+#              self.etaHigh_1st = binEdge['etaHigh']
+
           # I don't think the dictionary below follows the structure of the rest of the code
           # Therefore, commented out!
           #else:
@@ -87,8 +95,10 @@ class GetCorrection():
           # pT cuts for bin2
           self.pTLow = binEdge['pTLow']
           self.pTHigh = binEdge['pTHigh']
-          self.etaLow = binEdge['etaLow']
-          self.etaHigh = binEdge['etaHigh']
+          self.etaLow  = e_region_dict['eta_min']
+          self.etaHigh = e_region_dict['eta_max']
+#          self.etaLow = binEdge['etaLow']
+#          self.etaHigh = binEdge['etaHigh']
 
           # Lambdas is a dictionary of the original lambdas (which all start off at 1)
           self.Lambdas = lambdas
@@ -374,7 +384,8 @@ class GetCorrection():
 
           # Make a plotting frame (essentially a canvas).
           PmassZ = self.w.var("massZ").frame(RooFit.Bins(100))
-          PmassZ.GetXaxis().SetTitle("m_{\\ell\\ell}\\ [GeV]")
+          PmassZ.GetXaxis().SetTitle("m_{l^{+}l^{-}} [GeV]")
+#          PmassZ.GetXaxis().SetTitle("m_{\\ell\\ell}\\ [GeV]")
           PmassZ.GetYaxis().SetTitleOffset(1.3)
 
           # This adds the data to the plot.
@@ -507,6 +518,31 @@ class GetCorrection():
 
           lep2InBin2 = " (pT2 > " + str(self.pTLow) + " && pT2 < " + str(self.pTHigh) + ")"
           lep2InBin2 += " && (abs(eta2) > " + str(self.etaLow) + " && abs(eta2) < " + str(self.etaHigh) + ")"
+
+#          if self.fs == "e":
+#              self.cut += self.relpTerr_cut
+
+          # User selects electron region and correct parameters are grabbed via e_region_dict. 
+          if self.fs == 'e': 
+              lep1InBin1 += " && (lep1_ecalDriven == " + self.e_region_dict['ecalDriven'] 
+              lep1InBin1 += " && pterr1/pT1 " + self.e_region_dict['rel_pTErr'] 
+              lep1InBin1 += " && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+              #lep1InBin1 += " (lep1_ecalDriven && pterr1/pT1 < 0.07 && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+              
+              lep2InBin1 += " && (lep2_ecalDriven == " + self.e_region_dict['ecalDriven'] 
+              lep2InBin1 += " && pterr2/pT2 " + self.e_region_dict['rel_pTErr'] 
+              lep2InBin1 += " && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+              #lep2InBin1 = " (lep2_ecalDriven && pterr2/pT2 < 0.07 && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+              
+              lep1InBin2 += " && (lep1_ecalDriven == " + self.e_region_dict['ecalDriven'] 
+              lep1InBin2 += " && pterr1/pT1 " + self.e_region_dict['rel_pTErr'] 
+              lep1InBin2 += " && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
+              #lep1InBin2 += " && (abs(eta1) > " + str(self.etaLow_1st) + " && abs(eta1) < " + str(self.etaHigh_1st) + ")"
+              
+              lep2InBin2 += " && (lep2_ecalDriven == " + self.e_region_dict['ecalDriven'] 
+              lep2InBin2 += " && pterr2/pT2 " + self.e_region_dict['rel_pTErr'] 
+              lep2InBin2 += " && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
+              #lep2InBin2 += " && (abs(eta2) > " + str(self.etaLow_1st) + " && abs(eta2) < " + str(self.etaHigh_1st) + ")"
 
           if self.doLambda1:
              # apply all cuts so far (mZ,pT1,pT2,eta1,eta2) assuming leps are in same bin

@@ -1,0 +1,56 @@
+
+Total events in NTuple: 3505899
+Counting pairs of electrons:
+ECAL_region_1a:	[0, 0.8]	rel_pTErr < 3%:	538092	events, which is	15.348189%	of total events
+ECAL_region_1b:	[0.8, 1.0]	rel_pTErr < 3%:	24417	events, which is	0.696455%	of total events
+
+ECAL_region_2:	[0, 1.0]	rel_pTErr > 3%:	2250	events, which is	0.064178%	of total events
+
+ECAL_region_3a:	[1.0, 1.2]	rel_pTErr < 7%:	25653	events, which is	0.731710%	of total events
+ECAL_region_3b:	[1.2, 1.44]	rel_pTErr < 7%:	28440	events, which is	0.811204%	of total events
+ECAL_region_3c:	[1.44, 1.57]	rel_pTErr < 7%:	2382	events, which is	0.067943%	of total events
+ECAL_region_3d:	[1.57, 2.0]	rel_pTErr < 7%:	69575	events, which is	1.984512%	of total events
+ECAL_region_3e:	[2.0, 2.5]	rel_pTErr < 7%:	68890	events, which is	1.964974%	of total events
+
+ECAL_region_4:	[1.0, 1.2]	rel_pTErr > 7%:	4	events, which is	0.000114%	of total events
+
+Tracker_region_1:	[0, 1.44]:		1482	events, which is	0.042272%	of total events
+Tracker_region_2:	[1.44, 1.6]:		40	events, which is	0.001141%	of total events
+Tracker_region_3:	[1.6, 2.0]:		35	events, which is	0.000998%	of total events
+Tracker_region_4:	[2.0, 2.5]:		34	events, which is	0.000970%	of total events
+
+WARNING! Limited statistics found in region: Limited_stats_ECAL_region_1a_AND_ECAL_region_4:
+(percentage of events in this region is < 0.050)
+Using limited statistics procedure to increase statistics...
+Limited_stats_ECAL_region_1a_AND_ECAL_region_4:	EMPTYTEXT		3096	events, which is	0.088308%	of total events
+Old region percentage of total events compared to new region percentage:	0.000114	vs.	0.088308
+Limited_stats_ECAL_region_1a_AND_ECAL_region_4: has 774.000 more events than ECAL_region_4:
+
+WARNING! Limited statistics found in region: Limited_stats_ECAL_region_1a_AND_Tracker_region_1:
+(percentage of events in this region is < 0.050)
+Using limited statistics procedure to increase statistics...
+Limited_stats_ECAL_region_1a_AND_Tracker_region_1:	EMPTYTEXT		51188	events, which is	1.460053%	of total events
+Old region percentage of total events compared to new region percentage:	0.042272	vs.	1.460053
+Limited_stats_ECAL_region_1a_AND_Tracker_region_1: has 34.540 more events than Tracker_region_1:
+
+WARNING! Limited statistics found in region: Limited_stats_ECAL_region_1a_AND_Tracker_region_2:
+(percentage of events in this region is < 0.050)
+Using limited statistics procedure to increase statistics...
+Limited_stats_ECAL_region_1a_AND_Tracker_region_2:	EMPTYTEXT		7897	events, which is	0.225249%	of total events
+Old region percentage of total events compared to new region percentage:	0.001141	vs.	0.225249
+Limited_stats_ECAL_region_1a_AND_Tracker_region_2: has 197.425 more events than Tracker_region_2:
+
+WARNING! Limited statistics found in region: Limited_stats_ECAL_region_1a_AND_Tracker_region_3:
+(percentage of events in this region is < 0.050)
+Using limited statistics procedure to increase statistics...
+Limited_stats_ECAL_region_1a_AND_Tracker_region_3:	EMPTYTEXT		5453	events, which is	0.155538%	of total events
+Old region percentage of total events compared to new region percentage:	0.000998	vs.	0.155538
+Limited_stats_ECAL_region_1a_AND_Tracker_region_3: has 155.800 more events than Tracker_region_3:
+
+WARNING! Limited statistics found in region: Limited_stats_ECAL_region_1a_AND_Tracker_region_4:
+(percentage of events in this region is < 0.050)
+Using limited statistics procedure to increase statistics...
+Limited_stats_ECAL_region_1a_AND_Tracker_region_4:	EMPTYTEXT		6861	events, which is	0.195699%	of total events
+Old region percentage of total events compared to new region percentage:	0.000970	vs.	0.195699
+Limited_stats_ECAL_region_1a_AND_Tracker_region_4: has 201.794 more events than Tracker_region_4:
+
