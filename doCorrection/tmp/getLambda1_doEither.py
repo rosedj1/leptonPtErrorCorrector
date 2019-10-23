@@ -1,5 +1,6 @@
 from leptonPtErrorCorrector.doCorrection.pTErrCorrector import GetCorrection
 from PyUtils.fileUtils import copyFile, makeDirs
+from electron_regions import e_region_dict
 import argparse, sys
 
 #____________________________________________________________________________________________________
@@ -16,29 +17,30 @@ def ParseOption():
     parser.add_argument('--inputDir', dest='inputDir', type=str)
     parser.add_argument('--outputDir', dest='outputDir', type=str)
     parser.add_argument('--inputFileName', dest='inputFileName', type=str)
-    parser.add_argument('--debug', dest='debug', type=int)
+    parser.add_argument('--debug', dest='debug', type=int, default=0)
     parser.add_argument('--getPara', dest='getPara', type=int)
     parser.add_argument('--getLambda', dest='getLambda', type=int)
-    parser.add_argument('--e_region', dest='e_region', type=str)
+    parser.add_argument('--e_region', dest='e_region', type=str, default='')
     args = parser.parse_args()
     return args
 
 args=ParseOption()
 ## Flags passed in from doLambda1.sh
-pTLow          = args.ptLow           
-pTHigh         = args.ptHigh          
-etaLow         = args.etaLow          
-etaHigh        = args.etaHigh         
-fs             = args.fs              
-isData         = args.isData          
-shapeParaDir   = args.shapeParaDir
-inputDir       = args.inputDir
-outputDir      = args.outputDir #getLambda1/"
-inputfilename  = args.inputFileName
-DEBUG          = args.debug
-getPara        = args.getPara
-getLambda      = args.getLambda
-e_region       = args.e_region
+pTLow            = args.ptLow           
+pTHigh           = args.ptHigh          
+etaLow           = args.etaLow          
+etaHigh          = args.etaHigh         
+fs               = args.fs              
+isData           = args.isData          
+shapeParaDir     = args.shapeParaDir
+inputDir         = args.inputDir
+outputDir        = args.outputDir #getLambda1/"
+inputfilename    = args.inputFileName
+DEBUG            = args.debug
+getPara          = args.getPara
+getLambda        = args.getLambda
+e_region_choice  = e_region_dict[args.e_region]
+
 ## Make output dirs if they don't exist and copy index.php file.
 makeDirs(outputDir)
 makeDirs(shapeParaDir)
@@ -60,6 +62,11 @@ path['filename'] = inputfilename
 #path['input'] = "/raid/raid7/rosedj1/ForPeeps/ForFilippo/"
 #path['output'] = "/home/mhl/public_html/2016/20161125_mass/test/" #getLambda1/"
 
+print ("Analyzing", fs, "final state.")
+print "Running over file:\n %s%s" % (inputDir,inputfilename)
+if fs == 'e':
+    print "Electron region chosen:",args.e_region,"\n   with parameters:",e_region_choice
+
 #_____ Get Parameters _____#
 if getPara and not getLambda:
     print "Getting parameters..."
@@ -67,7 +74,7 @@ if getPara and not getLambda:
     # makes a GetCorrection object
     # shapePara starts off with all zeros
     tag = "doLambda1_getPara_" + fs
-    getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag) 
+    getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, e_region_choice) 
 
     if DEBUG:
         print "Parameters of getCorr_getPara object BEFORE fit:"
@@ -94,7 +101,7 @@ if getPara and not getLambda:
 elif getLambda and not getPara:
     print "Getting Lambda..."
     tag = "doLambda1_getLambda_" + fs
-    getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag)
+    getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, e_region_choice)
     #getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, e_region)
     #tmpPara_ =  __import__('test', globals(), locals())
 

@@ -23,46 +23,11 @@ RooMsgService.instance().setStreamStatus(1,False);
 setTDRStyle()
 
 gROOT.SetBatch(kTRUE)   # kTRUE will NOT draw plots to screen
-# Possible strings for e_regions (NEWNAME):
-## OLDNAME           NEWNAME                   ETABIN          RELPTERR      
-## ECAL_region_1a:   ECAL_barrel_pterrlow_a    [0, 0.8]        rel_pTErr < 3%
-## ECAL_region_1b:   ECAL_barrel_pterrlow_b    [0.8, 1.0]      rel_pTErr < 3%
-##                                                                           
-## ECAL_region_2:    ECAL_barrel_pterrhigh     [0, 1.0]        rel_pTErr > 3%
-##                                                                           
-## ECAL_region_3a:   ECAL_endcap_pterrlow_a    [1.0, 1.2]      rel_pTErr < 7%
-## ECAL_region_3b:   ECAL_endcap_pterrlow_b    [1.2, 1.44]     rel_pTErr < 7%
-## ECAL_region_3c:   ECAL_endcap_pterrlow_c    [1.44, 1.57]    rel_pTErr < 7%
-## ECAL_region_3d:   ECAL_endcap_pterrlow_d    [1.57, 2.0]     rel_pTErr < 7%
-## ECAL_region_3e:   ECAL_endcap_pterrlow_e    [2.0, 2.5]      rel_pTErr < 7%
-##                                                                           
-## ECAL_region_4:    ECAL_endcap_pterrhigh     [1.0, 1.2]      rel_pTErr > 7%
-##                                                                           
-## Tracker_region_1  Tracker_barrel            [0, 1.44]                                  
-## Tracker_region_2  Tracker_endcap_a          [1.44, 1.6]                                
-## Tracker_region_3  Tracker_endcap_b          [1.6, 2.0]                                 
-## Tracker_region_4  Tracker_endcap_c          [2.0, 2.5]                                 
-
-e_region_dict = {
-    'ECAL_barrel_pterrlow_a': {'eta_min':0.0,  'eta_max':0.8,  'rel_pTErr':'< 0.03'},
-    'ECAL_barrel_pterrlow_b': {'eta_min':0.8,  'eta_max':1.0,  'rel_pTErr':'< 0.03'},
-    'ECAL_barrel_pterrhigh' : {'eta_min':0.0,  'eta_max':1.0,  'rel_pTErr':'> 0.03'},
-    'ECAL_endcap_pterrlow_a': {'eta_min':1.0,  'eta_max':1.2,  'rel_pTErr':'< 0.07'},
-    'ECAL_endcap_pterrlow_b': {'eta_min':1.2,  'eta_max':1.44, 'rel_pTErr':'< 0.07'},
-    'ECAL_endcap_pterrlow_c': {'eta_min':1.44, 'eta_max':1.57, 'rel_pTErr':'< 0.07'},
-    'ECAL_endcap_pterrlow_d': {'eta_min':1.57, 'eta_max':2.0,  'rel_pTErr':'< 0.07'},
-    'ECAL_endcap_pterrlow_e': {'eta_min':2.0,  'eta_max':2.5,  'rel_pTErr':'< 0.07'},
-    'ECAL_endcap_pterrhigh' : {'eta_min':1.0,  'eta_max':1.2,  'rel_pTErr':'> 0.07'},
-    'Tracker_barrel'        : {'eta_min':0.0,  'eta_max':1.44, 'rel_pTErr':'> -1.0'},
-    'Tracker_endcap_a'      : {'eta_min':1.44, 'eta_max':1.6,  'rel_pTErr':'> -1.0'},
-    'Tracker_endcap_b'      : {'eta_min':1.6,  'eta_max':2.0,  'rel_pTErr':'> -1.0'},
-    'Tracker_endcap_c'      : {'eta_min':2.0,  'eta_max':2.5,  'rel_pTErr':'> -1.0'},
-}
 
 class GetCorrection():
 
       #def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
-      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag, e_region=''):
+      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag, e_region_dict):
           """
           ARGUMENTS:
             binEdge   =  {pTLow:<> ,pTHigh:<>, etaLow:<>, etaHigh:<>}
@@ -81,6 +46,7 @@ class GetCorrection():
             shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
             paths     = {'input':<input_DIR_to_NTuple>, 'output':<output_DIR>}
             tag       = "doLambda1_getPara_" + fs
+            e_region  = A dictionary to specify the kinematic regions of different electron regions.
           """
 
           # Hard-coded parameters
@@ -92,15 +58,18 @@ class GetCorrection():
           self.GENZ_width = 2.44
 
           self.selectors = {}
+          self.e_region_dict = e_region_dict
 
           self.doLambda1 = doLambda1 
           if not self.doLambda1:
              # doLambda1 == False in getLambda2_doPara.py
              # leptons in different bins!
-             self.pTLow_1st   = binEdge['pTLow']
-             self.pTHigh_1st  = binEdge['pTHigh']
-             self.etaLow_1st  = binEdge['etaLow']
-             self.etaHigh_1st = binEdge['etaHigh']
+              self.pTLow_1st   = binEdge['pTLow']
+              self.pTHigh_1st  = binEdge['pTHigh']
+              self.etaLow_1st  = e_region_dict['eta_min']
+              self.etaHigh_1st = e_region_dict['eta_max']             
+#             self.etaLow_1st  = binEdge['etaLow']
+#             self.etaHigh_1st = binEdge['etaHigh']
 #          if not self.doLambda1:
 #             self.pTLow_1st = doLambda1[1]['pTLow']
 #             self.pTHigh_1st = doLambda1[1]['pTHigh']
@@ -110,8 +79,11 @@ class GetCorrection():
           if doLambda1:
               self.pTLow_1st = binEdge['pTLow']
               self.pTHigh_1st = binEdge['pTHigh']
-              self.etaLow_1st = binEdge['etaLow']
-              self.etaHigh_1st = binEdge['etaHigh']
+              self.etaLow_1st  = e_region_dict['eta_min']
+              self.etaHigh_1st = e_region_dict['eta_max']             
+#              self.etaLow_1st = binEdge['etaLow']
+#              self.etaHigh_1st = binEdge['etaHigh']
+
           # I don't think the dictionary below follows the structure of the rest of the code
           # Therefore, commented out!
           #else:
@@ -123,8 +95,10 @@ class GetCorrection():
           # pT cuts for bin2
           self.pTLow = binEdge['pTLow']
           self.pTHigh = binEdge['pTHigh']
-          self.etaLow = binEdge['etaLow']
-          self.etaHigh = binEdge['etaHigh']
+          self.etaLow  = e_region_dict['eta_min']
+          self.etaHigh = e_region_dict['eta_max']
+#          self.etaLow = binEdge['etaLow']
+#          self.etaHigh = binEdge['etaHigh']
 
           # Lambdas is a dictionary of the original lambdas (which all start off at 1)
           self.Lambdas = lambdas
@@ -410,7 +384,7 @@ class GetCorrection():
 
           # Make a plotting frame (essentially a canvas).
           PmassZ = self.w.var("massZ").frame(RooFit.Bins(100))
-          PmassZ.GetXaxis().SetTitle("this is a test [GeV]")
+          PmassZ.GetXaxis().SetTitle("m_{l^{+}l^{-}} [GeV]")
 #          PmassZ.GetXaxis().SetTitle("m_{\\ell\\ell}\\ [GeV]")
           PmassZ.GetYaxis().SetTitleOffset(1.3)
 
@@ -550,19 +524,23 @@ class GetCorrection():
 
           # User selects electron region and correct parameters are grabbed via e_region_dict. 
           if self.fs == 'e': 
-              lep1InBin1 += " (lep1_ecalDriven && pterr1/pT1 " + e_region_dict[e_region]['rel_pTErr'] 
+              lep1InBin1 += " && (lep1_ecalDriven == " + self.e_region_dict['ecalDriven'] 
+              lep1InBin1 += " && pterr1/pT1 " + self.e_region_dict['rel_pTErr'] 
               lep1InBin1 += " && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
               #lep1InBin1 += " (lep1_ecalDriven && pterr1/pT1 < 0.07 && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
               
-              lep2InBin1 += " (lep2_ecalDriven && pterr2/pT2 " + e_region_dict[e_region]['rel_pTErr'] 
+              lep2InBin1 += " && (lep2_ecalDriven == " + self.e_region_dict['ecalDriven'] 
+              lep2InBin1 += " && pterr2/pT2 " + self.e_region_dict['rel_pTErr'] 
               lep2InBin1 += " && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
               #lep2InBin1 = " (lep2_ecalDriven && pterr2/pT2 < 0.07 && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
               
-              lep1InBin2 += " (lep1_ecalDriven && pterr1/pT1 " + e_region_dict[e_region]['rel_pTErr'] 
+              lep1InBin2 += " && (lep1_ecalDriven == " + self.e_region_dict['ecalDriven'] 
+              lep1InBin2 += " && pterr1/pT1 " + self.e_region_dict['rel_pTErr'] 
               lep1InBin2 += " && pT1 > " + str(self.pTLow_1st) + " && pT1 < " + str(self.pTHigh_1st) + ")"
               #lep1InBin2 += " && (abs(eta1) > " + str(self.etaLow_1st) + " && abs(eta1) < " + str(self.etaHigh_1st) + ")"
               
-              lep2InBin2 += " (lep2_ecalDriven && pterr2/pT2 " + e_region_dict[e_region]['rel_pTErr'] 
+              lep2InBin2 += " && (lep2_ecalDriven == " + self.e_region_dict['ecalDriven'] 
+              lep2InBin2 += " && pterr2/pT2 " + self.e_region_dict['rel_pTErr'] 
               lep2InBin2 += " && pT2 > " + str(self.pTLow_1st) + " && pT2 < " + str(self.pTHigh_1st) + ")"
               #lep2InBin2 += " && (abs(eta2) > " + str(self.etaLow_1st) + " && abs(eta2) < " + str(self.etaHigh_1st) + ")"
 
