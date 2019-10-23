@@ -1,6 +1,6 @@
 from leptonPtErrorCorrector.doCorrection.pTErrCorrector import GetCorrection
 from PyUtils.fileUtils import copyFile, makeDirs
-from electron_regions import e_region_dict
+from kinem_bins import e_region_dict
 import argparse, sys
 
 #____________________________________________________________________________________________________
