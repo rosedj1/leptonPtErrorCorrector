@@ -1,17 +1,14 @@
 from ROOT import *
 from array import array
-
 import argparse
 
 def ParseOption():
-
     parser = argparse.ArgumentParser(description='submit all')
     parser.add_argument('--isData', dest='isData', action="store_true", default=False)
     parser.add_argument('--savePath', dest='savePath', type=str, default=False)
 
     args = parser.parse_args()
     return args
-
 
 def getLambda2(txtName):
     data1 = [line.strip() for line in open(txtName+".txt", 'r')]
@@ -31,8 +28,10 @@ f1.cd()
 fs = 'e'
 
 Binx = [7, 100]
-Biny = [0, 0.7, 1, 1.5, 2.5]
-binx,biny = array('f'),array('f')
+#Biny = [0, 0.7, 1, 1.5, 2.5]
+Biny = [0, 0.8, 1, 1.2, 1.44, 1.57, 2, 2.5]
+binx = array('f')
+biny = array('f')
 
 for i in range(len(Binx)):
     binx.append(Binx[i])
@@ -48,7 +47,6 @@ for i in range(len(binx)-1):
         pTHigh = str(round(Binx[i+1],1))
         etaLow = str(round(Biny[j],1))
         etaHigh = str(round(Biny[j+1],1))
- 
 
 #        if float(etaLow) >= 1.5:
 #           pTLow = str(round(10.0, 1))
@@ -75,4 +73,3 @@ c1.SaveAs(savePath+"LUT_"+fs+".png")
 
 LUT.Write()
 f1.Close()
-        

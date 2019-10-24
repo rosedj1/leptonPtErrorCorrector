@@ -19,6 +19,8 @@ from array import array
 from math import *
 from tdrStyle import *
 from subprocess import call
+from leptonPtErrorCorrector.doCorrection.tmp.kinem_bins import kinem_bin_dict
+#from kinem_bins import kinem_bin_dict
 RooMsgService.instance().setStreamStatus(1,False);
 setTDRStyle()
 
@@ -26,8 +28,9 @@ gROOT.SetBatch(kTRUE)   # kTRUE will NOT draw plots to screen
 
 class GetCorrection():
 
-      #def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
-      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag, e_region_dict):
+#      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag):
+#      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag, e_region_dict):
+      def __init__(self, binEdge, isData, fs, doLambda1, lambdas, shapePara, paths, tag, kinem_bin_str):
           """
           ARGUMENTS:
             binEdge   =  {pTLow:<> ,pTHigh:<>, etaLow:<>, etaHigh:<>}
@@ -46,6 +49,7 @@ class GetCorrection():
             shapePara = {"mean":0, "alpha":0, "n":0, "tau":0, "fsig":0}
             paths     = {'input':<input_DIR_to_NTuple>, 'output':<output_DIR>}
             tag       = "doLambda1_getPara_" + fs
+            kinem_bin_str = key to kinem_bin_dict
             e_region  = A dictionary to specify the kinematic regions of different electron regions.
           """
 
@@ -58,7 +62,8 @@ class GetCorrection():
           self.GENZ_width = 2.44
 
           self.selectors = {}
-          self.e_region_dict = e_region_dict
+          self.kinem_bin_str = kinem_bin_str
+          self.e_region_dict = kinem_bin_dict[kinem_bin_str]
 
           self.doLambda1 = doLambda1 
           if not self.doLambda1:
@@ -66,8 +71,8 @@ class GetCorrection():
              # leptons in different bins!
               self.pTLow_1st   = binEdge['pTLow']
               self.pTHigh_1st  = binEdge['pTHigh']
-              self.etaLow_1st  = e_region_dict['eta_min']
-              self.etaHigh_1st = e_region_dict['eta_max']             
+              self.etaLow_1st  = self.e_region_dict['eta_min']
+              self.etaHigh_1st = self.e_region_dict['eta_max']             
 #             self.etaLow_1st  = binEdge['etaLow']
 #             self.etaHigh_1st = binEdge['etaHigh']
 #          if not self.doLambda1:
@@ -79,8 +84,8 @@ class GetCorrection():
           if doLambda1:
               self.pTLow_1st = binEdge['pTLow']
               self.pTHigh_1st = binEdge['pTHigh']
-              self.etaLow_1st  = e_region_dict['eta_min']
-              self.etaHigh_1st = e_region_dict['eta_max']             
+              self.etaLow_1st  = self.e_region_dict['eta_min']
+              self.etaHigh_1st = self.e_region_dict['eta_max']             
 #              self.etaLow_1st = binEdge['etaLow']
 #              self.etaHigh_1st = binEdge['etaHigh']
 
@@ -95,8 +100,8 @@ class GetCorrection():
           # pT cuts for bin2
           self.pTLow = binEdge['pTLow']
           self.pTHigh = binEdge['pTHigh']
-          self.etaLow  = e_region_dict['eta_min']
-          self.etaHigh = e_region_dict['eta_max']
+          self.etaLow  = self.e_region_dict['eta_min']
+          self.etaHigh = self.e_region_dict['eta_max']
 #          self.etaLow = binEdge['etaLow']
 #          self.etaHigh = binEdge['etaHigh']
 
@@ -130,9 +135,9 @@ class GetCorrection():
           self.outpath = paths['output']
           self.name = (self.filename.split('.'))[0]
           if self.doLambda1:
-             self.name += "_Pt_" + str(self.pTLow_1st)  + "_to_" + str(self.pTHigh_1st) + "_Eta_" + str(self.etaLow_1st) + "_to_" + str(self.etaHigh_1st)
+             self.name += "_Pt_" + self.kinem_bin_str + "_" + str(self.pTLow_1st)  + "_to_" + str(self.pTHigh_1st) + "_Eta_" + str(self.etaLow_1st) + "_to_" + str(self.etaHigh_1st)
           else:
-             self.name += "_Pt_" + str(self.pTLow)  + "_to_" + str(self.pTHigh) + "_Eta_" + str(self.etaLow) + "_to_" + str(self.etaHigh)
+             self.name += "_Pt_" + self.kinem_bin_str + "_" + str(self.pTLow)  + "_to_" + str(self.pTHigh) + "_Eta_" + str(self.etaLow) + "_to_" + str(self.etaHigh)
 
           # tag     = "doLambda1_getPara_" + fs
           self.name += "_" + tag
@@ -522,7 +527,7 @@ class GetCorrection():
 #          if self.fs == "e":
 #              self.cut += self.relpTerr_cut
 
-          # User selects electron region and correct parameters are grabbed via e_region_dict. 
+          # User selects electron region and correct parameters are grabbed via self.e_region_dict. 
           if self.fs == 'e': 
               lep1InBin1 += " && (lep1_ecalDriven == " + self.e_region_dict['ecalDriven'] 
               lep1InBin1 += " && pterr1/pT1 " + self.e_region_dict['rel_pTErr'] 

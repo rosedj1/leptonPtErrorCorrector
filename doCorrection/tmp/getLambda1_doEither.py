@@ -1,6 +1,7 @@
 from leptonPtErrorCorrector.doCorrection.pTErrCorrector import GetCorrection
+from leptonPtErrorCorrector.doCorrection.tmp.kinem_bins import kinem_bin_dict
 from PyUtils.fileUtils import copyFile, makeDirs
-from kinem_bins import e_region_dict
+#from kinem_bins import 
 import argparse, sys
 
 #____________________________________________________________________________________________________
@@ -9,8 +10,6 @@ def ParseOption():
     parser = argparse.ArgumentParser(description='submit all')
     parser.add_argument('--ptLow', dest='ptLow', type=float)
     parser.add_argument('--ptHigh', dest='ptHigh', type=float)
-    parser.add_argument('--etaLow', dest='etaLow', type=float)
-    parser.add_argument('--etaHigh', dest='etaHigh', type=float)
     parser.add_argument('--isData', dest='isData', action='store_true', default=False)
     parser.add_argument('--fs', dest='fs', type=str)
     parser.add_argument('--shapeParaDir', dest='shapeParaDir', type=str)
@@ -20,26 +19,29 @@ def ParseOption():
     parser.add_argument('--debug', dest='debug', type=int, default=0)
     parser.add_argument('--getPara', dest='getPara', type=int)
     parser.add_argument('--getLambda', dest='getLambda', type=int)
-    parser.add_argument('--e_region', dest='e_region', type=str, default='')
+    parser.add_argument('--kinem_bin', dest='kinem_bin', type=str, default='')
     args = parser.parse_args()
     return args
+    #parser.add_argument('--etaLow', dest='etaLow', type=float)
+    #parser.add_argument('--etaHigh', dest='etaHigh', type=float)
 
 args=ParseOption()
 ## Flags passed in from doLambda1.sh
-pTLow            = args.ptLow           
-pTHigh           = args.ptHigh          
-etaLow           = args.etaLow          
-etaHigh          = args.etaHigh         
-fs               = args.fs              
-isData           = args.isData          
-shapeParaDir     = args.shapeParaDir
-inputDir         = args.inputDir
-outputDir        = args.outputDir #getLambda1/"
-inputfilename    = args.inputFileName
-DEBUG            = args.debug
-getPara          = args.getPara
-getLambda        = args.getLambda
-e_region_choice  = e_region_dict[args.e_region]
+pTLow                = args.ptLow           
+pTHigh               = args.ptHigh          
+fs                   = args.fs              
+isData               = args.isData          
+shapeParaDir         = args.shapeParaDir
+inputDir             = args.inputDir
+outputDir            = args.outputDir #getLambda1/"
+inputfilename        = args.inputFileName
+DEBUG                = args.debug
+getPara              = args.getPara
+getLambda            = args.getLambda
+kinem_bin_str        = args.kinem_bin
+kinem_bin_local_dict = kinem_bin_dict[kinem_bin_str]
+etaLow               = kinem_bin_local_dict['eta_min']
+etaHigh              = kinem_bin_local_dict['eta_max']
 
 ## Make output dirs if they don't exist and copy index.php file.
 makeDirs(outputDir)
@@ -57,15 +59,11 @@ path = {}
 path['input']    = inputDir
 path['output']   = outputDir
 path['filename'] = inputfilename
-#path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_addpTScaleCorrection/"
-#path['input'] = "/raid/raid9/mhl/HZZ4L_Run2_post2016ICHEP/outputRoot/DY_2015MC_kalman_v4_NOmassZCut_useLepFSRForMassZ/"
-#path['input'] = "/raid/raid7/rosedj1/ForPeeps/ForFilippo/"
-#path['output'] = "/home/mhl/public_html/2016/20161125_mass/test/" #getLambda1/"
 
 print ("Analyzing", fs, "final state.")
 print "Running over file:\n %s%s" % (inputDir,inputfilename)
-if fs == 'e':
-    print "Electron region chosen:",args.e_region,"\n   with parameters:",e_region_choice
+#if fs == 'e':
+#    print "Electron region chosen:",args.e_region,"\n   with parameters:",e_region_choice
 
 #_____ Get Parameters _____#
 if getPara and not getLambda:
@@ -74,7 +72,8 @@ if getPara and not getLambda:
     # makes a GetCorrection object
     # shapePara starts off with all zeros
     tag = "doLambda1_getPara_" + fs
-    getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, e_region_choice) 
+    getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, kinem_bin_str) 
+#    getCorr_getPara = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, kinem_bin_local_dict) 
 
     if DEBUG:
         print "Parameters of getCorr_getPara object BEFORE fit:"
@@ -101,7 +100,8 @@ if getPara and not getLambda:
 elif getLambda and not getPara:
     print "Getting Lambda..."
     tag = "doLambda1_getLambda_" + fs
-    getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, e_region_choice)
+    getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, kinem_bin_str)
+#    getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, kinem_bin_local_dict)
     #getCorr_getLambda = GetCorrection(binEdge, isData, fs, doLambda1, lambdas, shapePara, path, tag, e_region)
     #tmpPara_ =  __import__('test', globals(), locals())
 

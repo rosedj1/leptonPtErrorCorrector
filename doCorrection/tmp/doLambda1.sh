@@ -62,7 +62,33 @@
 # ECAL ELECTRONS
 #time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --etaLow 0.8 --etaHigh 1.0 --fs e --debug 0 --e_region "ECAL_barrel_pterrhigh" --getPara 0 --getLambda 1 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/Electron_Regions/" --inputDir "/raid/raid8/ferrico/Useful_Code_HZZ/CMSSW_10_2_15/src/Full_RunII/madgraph/" --inputFileName "DYJetsToLL_M-50_Full_RunII_madgraph_m2e_2018.root" 
 #time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --etaLow 0.8 --etaHigh 1.0 --fs e --debug 0 --e_region "ECAL_barrel_pterrlow_a" --getPara 0 --getLambda 1 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/2018_" --inputDir "/raid/raid7/rosedj1/Higgs/HiggsMassMeas/NTuples_Skimmedwith_DYAna/" --inputFileName "2018_MC_MG5_DY_30percentoffiles_m2e.root" 
-time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --etaLow 0.8 --etaHigh 1.0 --fs e --debug 0 --e_region "ECAL_barrel_pterrlow_a" --getPara 0 --getLambda 1 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/2018_MC_mll_Plots/" --inputDir "/raid/raid7/rosedj1/Higgs/HiggsMassMeas/NTuples_Skimmedwith_DYAna/" --inputFileName "2018_MC_MG5_DY_30percentoffiles_m2e.root" 
+for kbin in \
+    'ECAL_barrel_pterrlow_a' \
+    'ECAL_barrel_pterrlow_b' \
+    'ECAL_barrel_pterrhigh'  \
+    'ECAL_endcap_pterrlow_a' \
+    'ECAL_endcap_pterrlow_b' \
+    'ECAL_endcap_pterrlow_c' \
+    'ECAL_endcap_pterrlow_d' \
+    'ECAL_endcap_pterrlow_e' ;
+###    'ECAL_endcap_pterrhigh'  ;
+#    'Tracker_barrel'         \
+#    'Tracker_endcap_a'       \
+#    'Tracker_endcap_b'       \
+#    'Tracker_endcap_c'       ; 
+do
+        time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --fs e --debug 0 --kinem_bin "${kbin}" --getPara 1 --getLambda 0 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/Plots_2018_MC_mll/" --inputDir "/raid/raid7/rosedj1/Higgs/HiggsMassMeas/NTuples_Skimmedwith_DYAna/" --inputFileName "2018_MC_MG5_DY_30percentoffiles_m2e.root" 
+        time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --fs e --debug 0 --kinem_bin "${kbin}" --getPara 0 --getLambda 1 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/Plots_2018_MC_mll/" --inputDir "/raid/raid7/rosedj1/Higgs/HiggsMassMeas/NTuples_Skimmedwith_DYAna/" --inputFileName "2018_MC_MG5_DY_30percentoffiles_m2e.root" 
+
+done
+
+########################################################
+#_____ 20191023 - getting ready for closure plots _____#
+########################################################
+#time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --fs e --debug 0 --kinem_bin "ECAL_barrel_pterrlow_b" --getPara 1 --getLambda 0 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/2018_MC_mll_Plots/" --inputDir "/raid/raid7/rosedj1/Higgs/HiggsMassMeas/NTuples_Skimmedwith_DYAna/" --inputFileName "2018_MC_MG5_DY_30percentoffiles_m2e.root" 
+#time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --fs e --debug 0 --kinem_bin "ECAL_barrel_pterrlow_b" --getPara 0 --getLambda 1 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/2018_MC_mll_Plots/" --inputDir "/raid/raid7/rosedj1/Higgs/HiggsMassMeas/NTuples_Skimmedwith_DYAna/" --inputFileName "2018_MC_MG5_DY_30percentoffiles_m2e.root" 
+#___________________________________________________________________________
+
 
 #time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --etaLow 0.8 --etaHigh 1.0 --fs e --debug 0 --e_region "ECAL_barrel_pterrlow_a" --getPara 0 --getLambda 1 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/Electron_Regions/" --inputDir "/raid/raid8/ferrico/Useful_Code_HZZ/CMSSW_10_2_15/src/Full_RunII/madgraph/" --inputFileName "DYJetsToLL_M-50_Full_RunII_madgraph_m2e_2018.root" 
 #time python getLambda1_doEither.py --ptLow 7 --ptHigh 100 --etaLow 0.8 --etaHigh 1.0 --fs e --debug 0 --e_region "ECAL_barrel_pterrlow_b" --getPara 1 --getLambda 0 --shapeParaDir "/home/rosedj1/HiggsMeasurement/CMSSW_8_0_32/src/leptonPtErrorCorrector/doCorrection/shapeParameters_jake/" --outputDir "/home/rosedj1/public_html/Higgs/HiggsMassMeas/ParameterPlotsTests/Electron_Regions/" --inputDir "/raid/raid8/ferrico/Useful_Code_HZZ/CMSSW_10_2_15/src/Full_RunII/madgraph/" --inputFileName "DYJetsToLL_M-50_Full_RunII_madgraph_m2e_2018.root" 
